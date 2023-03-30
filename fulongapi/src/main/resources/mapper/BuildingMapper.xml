@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rzyc.fulongapi.mapper.BuildingMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.rzyc.fulongapi.model.Building">
+        <id column="build_id" property="buildId" />
+        <result column="build_name" property="buildName" />
+        <result column="building_time" property="buildingTime" />
+        <result column="build_number" property="buildNumber" />
+        <result column="build_lat" property="buildLat" />
+        <result column="build_lon" property="buildLon" />
+        <result column="grid_parent_id" property="gridParentId" />
+        <result column="street_parent_id" property="streetParentId" />
+        <result column="risk_level" property="riskLevel" />
+        <result column="qr_code" property="qrCode" />
+        <result column="create_by" property="createBy" />
+        <result column="create_time" property="createTime" />
+        <result column="modify_by" property="modifyBy" />
+        <result column="modify_time" property="modifyTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        build_id, build_name,building_time, build_number,
+        build_lat, build_lon, grid_parent_id, street_parent_id,
+        building_manager,
+        building_manager_contact,
+        risk_level,
+        qr_code,
+        create_by, create_time, modify_by, modify_time
+    </sql>
+
+
+    <select id="importDangerFindForeign" resultType="com.rzyc.fulongapi.model.BuildFloor">
+        select t3.building_id buildingId,t3.unit_id unitId,t3.floor_id floorId
+        from building t1
+        left join build_unit t2 on t1.build_id = t2.building_id
+        left join build_floor t3 on t2.unit_id = t3.unit_id
+        where t1.direction = #{direction} and t1.build_number = #{buildingNumber}
+        and t2.unit_number = #{unitNumber} and t3.floor_number = #{floorNumber}
+    </select>
+
+
+
+    <select id="selectByBuildName" resultMap="BaseResultMap">
+        select build_id, build_name from building where build_name  = #{buildingName}
+    </select>
+
+    <resultMap id="BuildingAndUnits" type="com.rzyc.fulongapi.model.Building">
+        <id column="build_id" property="buildId" />
+        <result column="build_name" property="buildName" />
+        <result column="build_number" property="buildNumber" />
+        <result column="build_lat" property="buildLat" />
+        <result column="build_lon" property="buildLon" />
+        <result column="grid_parent_id" property="gridParentId" />
+        <result column="street_parent_id" property="streetParentId" />
+        <result column="risk_level" property="riskLevel" />
+        <result column="qr_code" property="qrCode" />
+        <result column="create_by" property="createBy" />
+        <result column="create_time" property="createTime" />
+        <result column="modify_by" property="modifyBy" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="direction" property="direction"/>
+        <result column="unitCount" property="unitCount"/>
+        <result column="map_unit_hidden_state" property="mapUnitHiddenState"/>
+        <collection property="units" column="id" ofType="com.rzyc.fulongapi.model.BuildUnit">
+            <id column="unit_id" property="unitId" />
+            <result column="unit_number" property="unitNumber" />
+            <result column="unit_name" property="unitName" />
+            <result column="risk_level" property="riskLevel" />
+        </collection>
+    </resultMap>
+
+    <select id="selectDangerAndBuilding" resultMap="BuildingAndUnits">
+        select build_id, build_name, build_number, build_lat, build_lon,direction,map_unit_hidden_state,
+        t3.unit_id,t3.unit_number,t3.unit_name,t3.risk_level
+        from building t1
+        left join build_unit t3 on t1.build_id = t3.building_id
+        order by t1.direction,t1.build_number,t3.unit_number asc
+    </select>
+
+    <select id="selectBuildingInfo" resultType="com.rzyc.fulongapi.model.Building">
+        select build_id, build_name,building_time, build_number, build_lat,map_unit_hidden_state mapUnitHiddenState,
+        build_lon,t1.building_manager as buildingManager ,t1.building_manager_contact as buildingManagerContact,
+        count(t2.unit_id)as unitCount
+         from building t1
+         left join build_unit t2 on t1.build_id = t2.building_id
+         where t1.build_id = #{id}
+    </select>
+
+
+    <!--修改风险等级-->
+    <update id="changeRiskLevel">
+        update building set risk_level = #{riskLevel} where build_id = #{buildId}
+    </update>
+
+    <!--查询所有-->
+    <select id="findAll" resultMap="BaseResultMap">
+        select * from building bd
+        ORDER BY bd.`direction` ASC,bd.`build_number` ASC
+    </select>
+
+    <!--查询楼栋信息-->
+    <select id="findBuilding" resultMap="BaseResultMap">
+        SELECT * FROM `building` bl
+        WHERE bl.`direction` = #{direction}
+          AND bl.`build_number` = #{buildNumber}
+    </select>
+
+    <!--修改二维码-->
+    <update id="changeQrCode">
+        update building set qr_code = #{qrCode}
+        where build_id = #{buildId}
+    </update>
+
+    <!--查询-->
+    <resultMap id="BuildDangerNumMap" type="com.rzyc.fulongapi.bean.index.BuildDangerNum">
+        <result column="build_id" property="buildId" />
+        <result column="build_name" property="buildName" />
+        <result column="dangerNum" property="dangerNum" />
+    </resultMap>
+
+    <!--楼栋隐患数据-->
+    <select id="buildDangerNum" resultMap="BuildDangerNumMap">
+        SELECT bd.`build_id`,bd.`build_name`,
+
+               (select count(*) from check_danger cd where cd.`building_id` = bd.`build_id`
+                    <if test="null != dangerTypeId and '' != dangerTypeId">
+                        and cd.`danger_type_id` = #{dangerTypeId}
+                    </if>
+                   ) dangerNum
+        FROM `building` bd
+        WHERE 1 = 1
+        ORDER BY bd.`direction` ASC,bd.`build_number` ASC;
+    </select>
+
+    <update id="updateUnitHiddenState">
+        update building set map_unit_hidden_state = #{state} where build_id = #{buildingId}
+    </update>
+
+    <!--楼栋列表-->
+    <select id="buildingList" resultMap="BaseResultMap">
+        SELECT * FROM `building` bd
+        WHERE
+        (bd.`build_name` LIKE #{condition} OR bd.`building_manager` LIKE #{condition})
+        <if test="null != buildIds and buildIds.size() > 0">
+            AND bd.`build_id` in
+            <foreach collection="buildIds" item="buildId" open="(" close=")" separator=",">
+                #{buildId}
+            </foreach>
+        </if>
+          <if test="null != direction">
+              AND bd.`direction` = #{direction}
+          </if>
+        ORDER BY bd.`direction` ASC,bd.`build_number` ASC
+    </select>
+
+    <select id="selectByDirectionAndNumber" resultMap="BaseResultMap">
+        select build_id, build_name,building_time, build_number,
+        build_lat, build_lon, grid_parent_id, street_parent_id,
+        building_manager,
+        building_manager_contact
+         from building where direction = #{direction} and build_number = #{buildingNumber}
+    </select>
+
+</mapper>

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rzyc.fulongapi.mapper.BuildFloorMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.rzyc.fulongapi.model.BuildFloor">
+        <id column="floor_id" property="floorId" />
+        <result column="building_id" property="buildingId" />
+        <result column="unit_id" property="unitId" />
+        <result column="unit_number" property="unitNumber" />
+        <result column="floor_number" property="floorNumber" />
+        <result column="household_size" property="householdSize" />
+        <result column="person_num" property="personNum" />
+        <result column="cooker_num" property="cookerNum" />
+        <result column="usertable_num" property="usertableNum" />
+        <result column="heater_num" property="heaterNum" />
+        <result column="risk_level" property="riskLevel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_by" property="createBy" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_by" property="modifyBy" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        floor_id, building_id, unit_id, unit_number, floor_number,risk_level,
+        person_num,cooker_num,usertable_num,heater_num,
+        household_size, create_time, create_by, modify_time, modify_by
+    </sql>
+
+    <!--单元楼层-->
+    <select id="findByUnitId" resultMap="BaseResultMap">
+        SELECT * FROM `build_floor` bf WHERE bf.`unit_id` = #{unitId}
+        ORDER BY bf.`floor_number` ASC
+    </select>
+
+    <!--修改风险等级-->
+    <update id="changeRiskLevel">
+        update build_floor set risk_level = #{riskLevel} where floor_id = #{floorId}
+    </update>
+
+    <!--查询所有-->
+    <select id="findAll" resultMap="BaseResultMap">
+        select * from build_floor
+    </select>
+
+    <!--修改楼层信息-->
+    <update id="changeNum">
+        UPDATE build_floor
+        SET
+            household_size = #{record.householdSize},
+            person_num = #{record.personNum},
+            cooker_num = #{record.cookerNum},
+            usertable_num = #{record.usertableNum},
+            heater_num = #{record.heaterNum}
+        WHERE `building_id` = #{record.buildingId}
+          AND `unit_id` = #{record.unitId}
+          AND `floor_number` = #{record.floorNumber}
+    </update>
+
+
+    <resultMap id="floorAndDangerCount" type="com.rzyc.fulongapi.model.BuildFloor">
+        <id column="floor_id" property="floorId" />
+        <result column="building_id" property="buildingId" />
+        <result column="unit_id" property="unitId" />
+        <result column="unit_number" property="unitNumber" />
+        <result column="floor_number" property="floorNumber" />
+        <result column="household_size" property="householdSize" />
+        <result column="house_type" property="houseType" />
+        <result column="person_num" property="personNum" />
+        <result column="cooker_num" property="cookerNum" />
+        <result column="usertable_num" property="usertableNum" />
+        <result column="heater_num" property="heaterNum" />
+        <result column="risk_level" property="riskLevel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_by" property="createBy" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_by" property="modifyBy" />
+        <result column="notRectifiedTotal" property="notRectifiedTotal"/>
+        <result column="rectifyingTotal" property="rectifyingTotal"/>
+        <result column="rectifiedTotal" property="rectifiedTotal"/>
+    </resultMap>
+
+
+    <select id="selectBuildingUnitFloorTable" resultMap="floorAndDangerCount">
+        select  floor_number,household_size,house_type,person_num,cooker_num,usertable_num,heater_num,risk_level,
+         SUM(case when cd.rectification_state = 1 then 1 else 0 end )as notRectifiedTotal,
+         SUM(case when cd.rectification_state = 2 then 1 else 0 end )as rectifyingTotal,
+         SUM(case when cd.rectification_state = 3 then 1 else 0 end )as rectifiedTotal
+         from  build_floor bf left join check_danger cd on bf.floor_id = cd.floor_fkey
+         where unit_id = #{unitId} GROUP BY bf.floor_id order by floor_number asc
+          limit #{page},#{pageSize}
+    </select>
+
+    <select id="selectBuildingUnitFloorTableCount" resultType="java.lang.Long">
+         select  count(0)
+         from  build_floor bf
+         where unit_id = #{unitId}
+    </select>
+
+    <select id="selectHouseHold" resultType="java.lang.Integer">
+        select sum(household_size) from build_floor where  building_id = #{buildingId}
+    </select>
+
+    <select id="selectAllBuildFloor" resultMap="BaseResultMap">
+        select floor_id, building_id, unit_id, unit_number, floor_number,risk_level,
+        person_num,cooker_num,usertable_num,heater_num,
+        household_size from build_floor
+    </select>
+
+    <select id="findFloorByUnitIdAndFloorNumber" resultMap="BaseResultMap">
+        select floor_id, building_id, unit_id, unit_number, floor_number,risk_level,
+        person_num,cooker_num,usertable_num,heater_num,
+        household_size from build_floor where unit_id = #{unitId} and floor_number = #{floorNumber}
+    </select>
+
+    <select id="getFloorIdByBuildingIdAndUnitIdAndFloor" resultType="java.lang.String">
+        select floor_id  from build_floor where building_id=#{buildingId} and unit_id=#{unitId} and floor_number=#{floor}
+    </select>
+
+    <!--已整改户数-->
+    <select id="sumByHouseholdSize" resultType="java.lang.Integer">
+        SELECT SUM(bf.household_size) FROM `build_floor` bf
+        WHERE bf.`risk_level` = 1;
+    </select>
+
+    <!--燃气点数-->
+    <select id="sumByUsertableNum" resultType="java.lang.Integer">
+        SELECT SUM(bf.usertable_num) FROM build_floor bf
+    </select>
+
+    <!--修改人数-->
+    <update id="changePersonNum">
+        UPDATE build_floor SET person_num =
+            (SELECT COUNT(*) FROM `building_resident` br WHERE br.floor_id = #{floorId})
+        where floor_id = #{floorId}
+    </update>
+
+</mapper>

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rzyc.fulongapi.mapper.EnterpriseMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.rzyc.fulongapi.model.Enterprise">
+        <id column="enterprise_id" property="enterpriseId" />
+        <result column="ent_name" property="entName" />
+        <result column="building_id" property="buildingId" />
+        <result column="building_unit_id" property="buildingUnitId" />
+        <result column="floor_fkey" property="floorFkey" />
+        <result column="industry_id" property="industryId" />
+        <result column="address" property="address" />
+        <result column="contacts" property="contacts" />
+        <result column="contact_mobile" property="contactMobile" />
+        <result column="work_num" property="workNum" />
+        <result column="person_num" property="personNum" />
+        <result column="cooker_num" property="cookerNum" />
+        <result column="usertable_num" property="usertableNum" />
+        <result column="heater_num" property="heaterNum" />
+        <result column="risk_level" property="riskLevel" />
+        <result column="qr_code" property="qrCode" />
+        <result column="create_time" property="createTime" />
+        <result column="create_by" property="createBy" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_by" property="modifyBy" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        enterprise_id, ent_name, building_id, building_unit_id, floor_fkey,
+    industry_id, address, contacts, contact_mobile, work_num, person_num,
+    cooker_num, usertable_num, heater_num, risk_level,qr_code,
+    create_time, create_by, modify_time, modify_by
+    </sql>
+
+    <!--企业列表-->
+    <select id="entList" resultMap="BaseResultMap">
+        SELECT st.type_name industryName,se.*
+        FROM `enterprise` se
+        left join store_type st on se.industry_id = st.id
+        WHERE se.`ent_name` LIKE #{condition}
+        <if test="null != buildIds and buildIds.size() > 0">
+            AND se.`building_id` in
+            <foreach collection="buildIds" item="buildId" open="(" close=")" separator=",">
+                #{buildId}
+            </foreach>
+        </if>
+        <if test="null != unitIds and unitIds.size() > 0">
+            AND se.`building_unit_id` in
+            <foreach collection="unitIds" item="unitId" open="(" close=")" separator=",">
+                #{unitId}
+            </foreach>
+        </if>
+        <if test="null != enterpriseId and '' != enterpriseId">
+            and se.enterprise_id = #{enterpriseId}
+        </if>
+        <if test="null != industryType and '' != industryType">
+            and se.industry_id = #{industryType}
+        </if>
+        ORDER BY se.`create_time` DESC
+    </select>
+
+    <!--修改企业二维码-->
+    <update id="changeQrCode">
+        update enterprise set qr_code = #{qrCode}
+        where enterprise_id = #{enterpriseId}
+    </update>
+
+    <!--修改企业二维码-->
+    <update id="changeIndustry">
+        update enterprise set industry_id = #{industryId}
+        where enterprise_id = #{enterpriseId}
+    </update>
+
+    <!--企业数量-->
+    <resultMap id="EntNumResultMap" type="com.rzyc.fulongapi.bean.index.EntNumInfo">
+        <result column="typeName" property="typeName" />
+        <result column="entNum" property="entNum" />
+    </resultMap>
+
+    <!--企业数量-->
+    <select id="entNumInfo" resultMap="EntNumResultMap">
+        SELECT st.`type_name` typeName,COUNT(st.id) entNum
+        FROM `enterprise` se
+            LEFT JOIN `store_type` st ON se.`industry_id` = st.`id`
+        GROUP BY st.`id`
+        ORDER BY sort_id ASC
+    </select>
+
+    <!--企业数量-->
+    <select id="entNumInfoV1" resultMap="EntNumResultMap">
+        SELECT st.`type_name` typeName,COUNT(st.id) entNum
+        FROM `enterprise` se
+            LEFT JOIN `store_type` st ON se.`industry_id` = st.`id`
+        GROUP BY st.`id`
+        ORDER BY st.sort_id ASC
+    </select>
+
+    <!--修改企业二维码-->
+    <update id="changeRiskLevel">
+        update enterprise set risk_level = #{riskLevel}
+        where enterprise_id = #{enterpriseId}
+    </update>
+
+    <!--企业总数-->
+    <select id="countAll" resultType="java.lang.Integer">
+        select count(*) from enterprise
+    </select>
+
+    <!--所有企业-->
+    <select id="findAll" resultMap="BaseResultMap">
+        select * from enterprise
+    </select>
+
+    <!--所有企业-->
+    <select id="findByName" resultMap="BaseResultMap">
+        select * from enterprise et where et.ent_name = #{entName}
+    </select>
+</mapper>

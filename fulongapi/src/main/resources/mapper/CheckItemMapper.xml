@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rzyc.fulongapi.mapper.CheckItemMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.rzyc.fulongapi.model.CheckItem">
+        <id column="item_id" property="itemId" />
+        <result column="check_item_name" property="checkItemName" />
+        <result column="class_id" property="classId" />
+        <result column="item_content" property="itemContent" />
+        <result column="check_help" property="checkHelp"/>
+        <result column="danger_type_name" property="dangerTypeName" />
+        <result column="item_legal_basis" property="itemLegalBasis" />
+        <result column="create_time" property="createTime" />
+        <result column="create_by" property="createBy" />
+        <result column="type_name" property="industryName" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        item_id, check_item_name, class_id, item_content, item_legal_basis, create_time, create_by
+    </sql>
+
+    <!--所有检查项-->
+    <select id="findAll" resultMap="BaseResultMap">
+        SELECT * FROM `check_item` ci where ci.`create_time` >= '2022-03-15 00:00:01'
+    </select>
+
+    <!--检查清单下检查项-->
+    <select id="findByClassId" resultMap="BaseResultMap">
+        SELECT dt.`danger_type_name`,
+               ci.* FROM `check_list_item` li
+                   LEFT JOIN `check_item` ci ON li.`item_id` = ci.`item_id`
+                   LEFT JOIN `danger_type` dt ON ci.`class_id` = dt.`danger_type_id`
+        WHERE  1=1
+        <if test="null != classId and '' != classId">
+            and li.`class_id` = #{classId}
+        </if>
+        ORDER BY dt.`sort_id` ASC,ci.`item_id` ASC
+        <if test="null != page and null != pageSize" >
+        limit #{page},#{pageSize}
+        </if>
+    </select>
+
+    <select id="findByClassIdV1" resultMap="BaseResultMap">
+        SELECT distinct dt.`danger_type_name`,
+        ci.* FROM `check_list_item` li
+        LEFT JOIN `check_item` ci ON li.`item_id` = ci.`item_id`
+        LEFT JOIN `danger_type` dt ON ci.`class_id` = dt.`danger_type_id`
+        WHERE  1=1
+        <if test="null != classId and '' != classId">
+            and li.`class_id` = #{classId}
+        </if>
+        ORDER BY dt.`sort_id` ASC,ci.`item_id` ASC
+        <if test="null != page and null != pageSize" >
+            limit #{page},#{pageSize}
+        </if>
+    </select>
+
+    <select id="findByClassIdForWeb" resultMap="BaseResultMap">
+        SELECT distinct dt.`danger_type_name`,
+        ci.* FROM   `check_item` ci
+        LEFT JOIN `danger_type` dt ON ci.`class_id` = dt.`danger_type_id`
+        WHERE  1=1
+        <if test="null != classId and '' != classId">
+            and ci.`class_id` = #{classId}
+        </if>
+        and (
+            ci.check_item_name like #{condition}
+                or ci.item_content like #{condition}
+                or ci.item_legal_basis like #{condition}
+                or ci.check_help like #{condition}
+            )
+        ORDER BY dt.`sort_id` ASC,ci.`item_id` ASC
+        <if test="null != page and null != pageSize" >
+            limit #{page},#{pageSize}
+        </if>
+    </select>
+
+
+    <select id="findByClassIdCount" resultType="java.lang.Long">
+        select count(distinct ci.item_id) from  `check_item`  as ci
+        LEFT JOIN `check_list_item` li ON li.`item_id` = ci.`item_id`
+        WHERE 1=1
+        <if test="null != classId and '' != classId">
+            and li.`class_id` = #{classId}
+        </if>
+        <if test="null != condition">
+            and (
+            ci.check_item_name like #{condition}
+            or ci.item_content like #{condition}
+            or ci.item_legal_basis like #{condition}
+            or ci.check_help like #{condition}
+            )
+        </if>
+    </select>
+
+    <!--行业检查项-->
+    <select id="findByIndustryId" resultMap="BaseResultMap">
+        SELECT dt.`danger_type_name`,
+               ci.*
+        FROM `check_item` ci
+            LEFT JOIN `danger_type` dt ON ci.`class_id` = dt.`danger_type_id`
+        WHERE ci.`industry_id` = #{industryId}
+    </select>
+
+</mapper>

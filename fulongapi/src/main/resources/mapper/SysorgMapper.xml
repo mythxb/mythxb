@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rzyc.fulongapi.mapper.SysorgMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.rzyc.fulongapi.model.Sysorg">
+        <id column="OrgCode" property="OrgCode" />
+        <result column="OrgName" property="OrgName" />
+        <result column="OrgLevel" property="OrgLevel" />
+        <result column="SuperiorOrgCode" property="SuperiorOrgCode" />
+        <result column="OrgLongitude" property="OrgLongitude" />
+        <result column="OrgLatitude" property="OrgLatitude" />
+        <result column="Principal" property="Principal" />
+        <result column="MobileTel" property="MobileTel" />
+        <result column="CreatedBy" property="CreatedBy" />
+        <result column="CreatedOn" property="CreatedOn" />
+        <result column="ModifiedBy" property="ModifiedBy" />
+        <result column="ModifiedOn" property="ModifiedOn" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        OrgCode, OrgName, OrgLevel, SuperiorOrgCode, OrgLongitude, OrgLatitude, Principal, MobileTel, CreatedBy, CreatedOn, ModifiedBy, ModifiedOn
+    </sql>
+
+</mapper>

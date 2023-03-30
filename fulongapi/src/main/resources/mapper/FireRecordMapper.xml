@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rzyc.fulongapi.mapper.FireRecordMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.rzyc.fulongapi.model.FireRecord">
+        <id column="record_id" property="recordId" />
+        <result column="alarm_time" property="alarmTime" />
+        <result column="alarm_member" property="alarmMember" />
+        <result column="alarm_address" property="alarmAddress" />
+        <result column="alarm_car" property="alarmCar" />
+        <result column="end_time" property="endTime" />
+        <result column="fire_cause" property="fireCause" />
+        <result column="loss" property="loss" />
+        <result column="fire_station_id" property="fireStationId" />
+        <result column="create_time" property="createTime" />
+        <result column="create_by" property="createBy" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_by" property="modifyBy" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        record_id, alarm_time, alarm_member, alarm_address, alarm_car, end_time, fire_cause, loss, fire_station_id, create_time, create_by, modify_time, modify_by
+    </sql>
+    <resultMap id="alarmRecordMap" type="com.rzyc.fulongapi.bean.fire.vo.AlarmRecordVo">
+        <id column="record_id" property="recordId"/>
+        <result column="alarm_time" property="alarmTime"/>
+        <result column="alarm_member" property="alarmMember"/>
+        <result column="alarm_address" property="alarmAddress"/>
+        <result column="alarm_car" property="alarmCar"/>
+        <result column="end_time" property="endTime"/>
+        <result column="fire_cause" property="fireCause"/>
+        <result column="loss" property="loss"/>
+        <result column="fire_station_id" property="fireStationId"/>
+    </resultMap>
+<!--出警记录-->
+    <select id="alarmRecord" resultMap="alarmRecordMap">
+        select fire.record_id,fire.alarm_time,fire.alarm_member,
+               fire.alarm_address,fire.alarm_car,fire.end_time,fire.fire_cause,fire.loss,fire.fire_station_id
+        from fire_record as fire
+        <if test="alarmRecordDto.fireStationId!=null and alarmRecordDto.fireStationId!=''">
+            where fire.fire_station_id = #{alarmRecordDto.fireStationId}
+        </if>
+    </select>
+</mapper>

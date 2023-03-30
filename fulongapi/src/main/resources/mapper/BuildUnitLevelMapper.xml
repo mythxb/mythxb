@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rzyc.fulongapi.mapper.BuildUnitLevelMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.rzyc.fulongapi.model.BuildUnitLevel">
+        <id column="level_id" property="levelId" />
+        <result column="building_id" property="buildingId" />
+        <result column="unit_id" property="unitId" />
+        <result column="house_type" property="houseType" />
+        <result column="plan_info" property="planInfo" />
+        <result column="area_num" property="areaNum" />
+        <result column="structure_type" property="structureType" />
+        <result column="layer_num" property="layerNum" />
+        <result column="additional" property="additional" />
+        <result column="additional_num" property="additionalNum" />
+        <result column="additional_time" property="additionalTime" />
+        <result column="change_function" property="changeFunction" />
+        <result column="use_info" property="useInfo" />
+        <result column="reform" property="reform" />
+        <result column="reform_info" property="reformInfo" />
+        <result column="reform_time" property="reformTime" />
+        <result column="foundation" property="foundation" />
+        <result column="superstructure" property="superstructure" />
+        <result column="entirety" property="entirety" />
+        <result column="problem_img" property="problemImg" />
+        <result column="safety_appraisal" property="safetyAppraisal" />
+        <result column="proposal_desc" property="proposalDesc" />
+        <result column="facade_img" property="facadeImg" />
+        <result column="base_img" property="baseImg" />
+        <result column="partition_desc" property="partitionDesc" />
+        <result column="create_time" property="createTime" />
+        <result column="create_by" property="createBy" />
+        <result column="modify_by" property="modifyBy" />
+        <result column="modify_time" property="modifyTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        level_id, building_id, unit_id, house_type, plan_info, area_num,
+        structure_type, layer_num, additional, additional_num, additional_time,
+        change_function, use_info, reform, reform_info,reform_time,
+        foundation, superstructure, entirety, problem_img,
+        safety_appraisal, proposal_desc, facade_img, base_img, partition_desc, create_time,
+        create_by, modify_by, modify_time
+    </sql>
+
+    <!--单元房屋信息-->
+    <select id="findByUnitId" resultMap="BaseResultMap">
+        select * from build_unit_level ul where ul.unit_id = #{unitId} limit 1
+    </select>
+
+</mapper>

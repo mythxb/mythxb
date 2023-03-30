@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rzyc.fulongapi.mapper.SysUserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.rzyc.fulongapi.model.SysUser">
+        <id column="user_id" property="userId"/>
+        <result column="district_id" property="districtId"/>
+        <result column="city_id" property="cityId"/>
+        <result column="community_id" property="communityId"/>
+        <result column="user_name" property="userName"/>
+        <result column="user_account" property="userAccount"/>
+        <result column="user_password" property="userPassword"/>
+        <result column="user_phone" property="userPhone"/>
+        <result column="user_type" property="userType"/>
+        <result column="organization" property="organization"/>
+        <result column="unit_id" property="unitId"/>
+        <result column="build_id" property="buildId"/>
+        <result column="enterprise_id" property="enterpriseId"/>
+        <result column="user_role" property="userRole"/>
+        <result column="create_time" property="createTime"/>
+        <result column="modify_time" property="modifyTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="modify_by" property="modifyBy"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        user_id
+        , district_id, city_id, community_id, user_name, user_account,
+        user_password, user_phone, user_type, organization,build_id,unit_id,enterprise_id,
+        user_role, create_time, modify_time, create_by, modify_by
+    </sql>
+
+    <!--根据账号查询用户-->
+    <select id="findByAccount" resultMap="BaseResultMap">
+        SELECT *
+        FROM `sys_user` su
+        WHERE su.`user_account` = #{userAccount}
+    </select>
+
+    <!--修改密码-->
+    <update id="changePasswd">
+        update sys_user
+        set user_password = #{userPassword}
+        where user_id = #{userId}
+    </update>
+
+    <!--用户列表-->
+    <select id="selectUserList" resultMap="BaseResultMap">
+        select su.`user_id`,
+        su.`district_id`,
+        su.`city_id`,
+        su.`community_id`,
+        su.`user_name`,
+        su.`user_account`,
+        su.`user_password`,
+        su.`user_phone`,
+        su.`user_type`,
+        su.`organization`,
+        su.`user_role`,
+        su.`build_id`,
+        su.`unit_id`,
+        su.`enterprise_id`
+        from sys_user su
+        where 1=1
+        <if test="userNameCondition!=null">
+            and su.`user_name` like #{userNameCondition}
+        </if>
+        <if test="condition!=null">
+            and (
+                su.`user_name` like #{condition}
+                or su.`user_account` like #{condition}
+                or su.`user_phone` like #{condition}
+                or su.`user_type` like #{condition}
+            )
+        </if>
+        order by su.`create_time` asc
+        limit #{page}, #{pageSize}
+    </select>
+
+    <!--用户总数-->
+    <select id="selectUserCount" resultType="java.lang.Long">
+        select count(*)
+        from sys_user su
+        where 1=1
+        <if test="userNameCondition!=null">
+            and su.`user_name` like #{userNameCondition}
+        </if>
+        <if test="condition!=null">
+            and (
+                su.`user_name` like #{condition}
+                or su.`user_account` like #{condition}
+                or su.`user_phone` like #{condition}
+                or su.`user_type` like #{condition}
+            )
+        </if>
+    </select>
+
+    <!--通过名字获取用户-->
+    <select id="getByName" resultMap="BaseResultMap">
+        select *
+        from sys_user
+        where user_name = #{name}
+    </select>
+
+    <!--通过企业id查询-->
+    <select id="findByEnterpriseId" resultMap="BaseResultMap">
+        select su.*
+        from sys_user su
+        where su.enterprise_id = #{enterpriseId}
+    </select>
+
+    <!--查询其他账号电话-->
+    <select id="findNotUserId" resultMap="BaseResultMap">
+        SELECT *
+        FROM `sys_user` su
+        WHERE su.`user_account` = #{userAccount}
+        and su.user_id != #{userId}
+    </select>
+
+    <!--根据账号查询用户-->
+    <select id="findByGovAccount" resultMap="BaseResultMap">
+        SELECT *
+        FROM `sys_user` su
+        WHERE su.`user_account` = #{userAccount}
+        and su.user_type != #{userType}
+    </select>
+
+</mapper>

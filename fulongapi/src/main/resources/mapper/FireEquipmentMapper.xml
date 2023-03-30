@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rzyc.fulongapi.mapper.FireEquipmentMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.rzyc.fulongapi.model.FireEquipment">
+        <id column="fe_id" property="feId" />
+        <result column="fe_name" property="feName" />
+        <result column="fe_unit" property="feUnit" />
+        <result column="fe_number" property="feNumber" />
+        <result column="fe_category_id" property="feCategoryId" />
+        <result column="fs_id" property="fsId" />
+        <result column="create_time" property="createTime" />
+        <result column="create_by" property="createBy" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        fe_id, fe_name, fe_unit, fe_number, fe_category_id, fs_id, create_time, create_by
+    </sql>
+
+    <select id="equipmentTable" resultMap="BaseResultMap">
+        select fe_id, fe_name, fe_unit, fe_number, fe_category_id, fs_id from fire_equipment
+        where fe_category_id = #{feCategoryId} limit #{page},#{pageSize}
+    </select>
+
+    <select id="equipmentTableCount" resultType="java.lang.Integer">
+        select count(0) from fire_equipment where  fe_category_id = #{feCategoryId}
+    </select>
+
+</mapper>

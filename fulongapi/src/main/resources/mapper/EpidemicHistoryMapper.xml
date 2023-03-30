@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rzyc.fulongapi.mapper.EpidemicHistoryMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.rzyc.fulongapi.model.EpidemicHistory">
+        <result column="epidemic_id" property="epidemicId" />
+        <result column="street_name" property="streetName" />
+        <result column="community_name" property="communityName" />
+        <result column="china_name" property="chinaName" />
+        <result column="sex" property="sex" />
+        <result column="age" property="age" />
+        <result column="card_id" property="cardId" />
+        <result column="mobile" property="mobile" />
+        <result column="key_area" property="keyArea" />
+        <result column="sojourn_history" property="sojournHistory" />
+        <result column="sojourn_province" property="sojournProvince" />
+        <result column="sojourn_city" property="sojournCity" />
+        <result column="sojourn_district" property="sojournDistrict" />
+        <result column="sojourn_address" property="sojournAddress" />
+        <result column="sojourn_level" property="sojournLevel" />
+        <result column="traffic" property="traffic" />
+        <result column="setout_time" property="setoutTime" />
+        <result column="arrive_time" property="arriveTime" />
+        <result column="manager_time" property="managerTime" />
+        <result column="census_register" property="censusRegister" />
+        <result column="arrive_address" property="arriveAddress" />
+        <result column="testing_time" property="testingTime" />
+        <result column="testing_state" property="testingState" />
+        <result column="isolate_state" property="isolateState" />
+        <result column="start_time" property="startTime" />
+        <result column="community_person" property="communityPerson" />
+        <result column="community_mobile" property="communityMobile" />
+        <result column="community_work" property="communityWork" />
+        <result column="medical_person" property="medicalPerson" />
+        <result column="medical_mobile" property="medicalMobile" />
+        <result column="medical_work" property="medicalWork" />
+        <result column="propertyer" property="propertyer" />
+        <result column="property_phone" property="propertyPhone" />
+        <result column="streeter" property="streeter" />
+        <result column="street_phone" property="streetPhone" />
+        <result column="communityer" property="communityer" />
+        <result column="community_phone" property="communityPhone" />
+        <result column="create_time" property="createTime" />
+        <result column="create_by" property="createBy" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_by" property="modifyBy" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        epidemic_id, street_name, community_name, china_name, sex, age, card_id, mobile, key_area, sojourn_history, sojourn_province, sojourn_city, sojourn_district, sojourn_address, sojourn_level, traffic, setout_time, arrive_time, manager_time, census_register, arrive_address, testing_time, testing_state, isolate_state, start_time, community_person, community_mobile, community_work, medical_person, medical_mobile, medical_work, propertyer, property_phone, streeter, street_phone, communityer, community_phone, create_time, create_by, modify_time, modify_by
+    </sql>
+
+    <!--新增数据-->
+    <insert id="insertData">
+        INSERT INTO `epidemic_history`
+        SELECT * FROM epidemic WHERE TO_DAYS(modify_time) = TO_DAYS(#{time})
+    </insert>
+
+</mapper>

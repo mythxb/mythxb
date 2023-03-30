@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rzyc.fulongapi.mapper.NewsMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.rzyc.fulongapi.model.News">
+        <id column="news_id" property="newsId" />
+        <result column="title" property="title" />
+        <result column="cover" property="cover" />
+        <result column="author" property="author" />
+        <result column="top_state" property="topState" />
+        <result column="banner_state" property="bannerState" />
+        <result column="create_time" property="createTime" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="create_by" property="createBy" />
+        <result column="modify_by" property="modifyBy" />
+        <result column="createByName" property="createByName" />
+        <result column="modifyByName" property="modifyByName" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        news_id, title, cover, author, top_state, banner_state, create_time, modify_time, create_by, modify_by
+    </sql>
+
+    <!--banner列表-->
+    <select id="findByBannerState" resultMap="BaseResultMap">
+        SELECT * FROM `news` nw WHERE nw.`banner_state` = #{bannerState}
+        ORDER BY nw.`modify_time` DESC
+    </select>
+
+    <!--最新一条新闻-->
+    <select id="findByTime" resultMap="BaseResultMap">
+        SELECT * FROM news nw ORDER BY nw.`modify_time` DESC LIMIT 1
+    </select>
+
+    <!--新闻列表-->
+    <select id="newsList" resultMap="BaseResultMap">
+        SELECT * FROM news nw
+        WHERE nw.`title` LIKE #{condition} or nw.`author` LIKE #{condition}
+        ORDER BY nw.`top_state` ASC,nw.`modify_time` DESC
+    </select>
+
+    <select id="selectDetail" resultMap="BaseResultMap">
+        select nw.*,su.user_name createByName,su2.user_name modifyByName from news nw
+        left join  sys_user su on nw.create_by  = su.user_id
+        left join  sys_user su2 on nw.modify_by  = su2.user_id
+        where news_id = #{newsId}
+    </select>
+</mapper>

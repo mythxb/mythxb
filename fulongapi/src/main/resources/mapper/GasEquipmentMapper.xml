@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rzyc.fulongapi.mapper.GasEquipmentMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.rzyc.fulongapi.model.GasEquipment">
+        <id column="ge_id" property="geId" />
+        <result column="gas_eq_name" property="gasEqName" />
+        <result column="eq_type" property="eqType" />
+        <result column="gas_eq_purchase_time" property="gasEqPurchaseTime" />
+        <result column="gas_eq_delivery_time" property="gasEqDeliveryTime" />
+        <result column="overdue" property="overdue" />
+        <result column="floor_id" property="floorId" />
+        <result column="create_time" property="createTime" />
+        <result column="create_by" property="createBy" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_by" property="modifyBy" />
+        <result column="building_id" property="buildingId"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        ge_id, gas_eq_name, eq_type, gas_eq_purchase_time, gas_eq_delivery_time, overdue, floor_id, create_time, create_by, modify_time, modify_by
+    </sql>
+
+    <select id="selectGasEquipmentList" resultMap="BaseResultMap">
+        select ge.ge_id, ge.gas_eq_name, ge.eq_type, ge.gas_eq_purchase_time, ge.gas_eq_delivery_time, ge.overdue,
+         ge.floor_id,ge.unit_id,bu.building_id
+        from gas_equipment ge  left join build_unit bu on ge.unit_id = bu.unit_id
+        where 1=1
+        <if test="null != floorId and '' != floorId">
+            and   ge.floor_id = #{floorId}
+        </if>
+        <if test="null != unitId and '' != unitId">
+            and   ge.unit_id = #{unitId}
+        </if>
+        order by ge.create_time asc
+        limit #{page},#{pageSize}
+    </select>
+
+    <select id="selectGasEquipmentCount" resultType="java.lang.Long">
+        select  COUNT(0) from  gas_equipment  where 1=1 
+        <if test="null != floorId and '' != floorId">
+            and   floor_id = #{floorId}
+        </if>
+        <if test="null != unitId and '' != unitId">
+            and   unit_id = #{unitId}
+        </if>
+    </select>
+
+    <delete id="deleteByUnitOrFloor">
+        delete from  gas_equipment where unit_id = #{unitId} and floor_id = #{floorId}
+    </delete>
+
+</mapper>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rzyc.fulongapi.mapper.RoleMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.rzyc.fulongapi.model.Role">
+        <id column="role_id" property="roleId"/>
+        <result column="role_name" property="roleName"/>
+        <result column="role_type" property="roleType"/>
+        <result column="create_time" property="createTime"/>
+        <result column="modify_time" property="modifyTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="modify_by" property="modifyBy"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        role_id
+        , role_name, role_type, create_time, modify_time, create_by, modify_by
+    </sql>
+
+
+    <!-- 角色路由映射结果 -->
+    <resultMap id="RoleResourceMap" type="com.rzyc.fulongapi.bean.user.RoleResource">
+        <id column="role_id" property="roleId"/>
+        <result column="role_name" property="roleName"/>
+        <result column="role_type" property="roleType"/>
+        <result column="create_time" property="createTime"/>
+        <result column="modify_time" property="modifyTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="modify_by" property="modifyBy"/>
+        <result column="role_resource_id" property="roleResourceId"/>
+        <result column="GROUP_CONCAT(srr.resource_id)" property="muResourceId"/>
+    </resultMap>
+
+    <!--角色列表分页-->
+    <select id="selectRoleList" resultMap="RoleResourceMap">
+        SELECT
+        r.role_id,
+        r.role_name,
+        r.role_type,
+        r.create_time,
+        r.modify_time,
+        r.create_by,
+        r.modify_by,
+        srr.role_resource_id,
+        GROUP_CONCAT(srr.resource_id)
+        FROM
+        role r
+        LEFT JOIN sys_role_resource srr ON r.role_id = srr.role_id
+        where r.role_name like #{condition}
+        GROUP BY
+        r.role_id
+        <if test="null != page ">
+            limit #{page},#{pageSize}
+        </if>
+    </select>
+
+    <!--全部角色信息-->
+    <select id="getRole" resultMap="BaseResultMap">
+        select *
+        from role
+    </select>
+
+    <!--角色总数-->
+    <select id="selectRoleCount" resultType="java.lang.Long">
+        select count(0)
+        from role
+        where role_name like #{condition}
+    </select>
+
+    <!--通过角色名获取角色-->
+    <select id="getByName" resultType="com.rzyc.fulongapi.model.Role">
+        select * from role where role_name=#{name}
+    </select>
+
+</mapper>

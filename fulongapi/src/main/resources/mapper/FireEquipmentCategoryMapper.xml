@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rzyc.fulongapi.mapper.FireEquipmentCategoryMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.rzyc.fulongapi.model.FireEquipmentCategory">
+        <id column="fec_id" property="fecId" />
+        <result column="fec_name" property="fecName" />
+        <result column="create_by" property="createBy" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        fec_id, fec_name, create_by, create_time
+    </sql>
+
+    <!--消防类别列表-->
+    <select id="equipmentCategory" resultMap="BaseResultMap">
+        select  fec_id, fec_name from fire_equipment_category limit #{page},#{pageSize}
+    </select>
+
+    <!--消防类别总数-->
+    <select id="equipmentCategoryCount" resultType="java.lang.Integer">
+        select count(0) from fire_equipment_category
+    </select>
+
+    <resultMap id="categoryAndResource" type="com.rzyc.fulongapi.model.FireEquipmentCategory">
+        <id column="fec_id" property="fecId" />
+        <result column="fec_name" property="fecName" />
+        <result column="create_by" property="createBy" />
+        <result column="create_time" property="createTime" />
+        <collection property="fireEquipments"  column="feId" ofType="com.rzyc.fulongapi.model.FireEquipment">
+            <id column="fe_id" property="feId" />
+            <result column="fe_name" property="feName" />
+            <result column="fe_unit" property="feUnit" />
+            <result column="fe_number" property="feNumber" />
+            <result column="fe_category_id" property="feCategoryId" />
+            <result column="fs_id" property="fsId" />
+        </collection>
+    </resultMap>
+
+    <!--消防器材和类别-->
+    <select id="equipmentCategoryAndResource" resultMap="categoryAndResource">
+       select b.*,fe_id, fe_name, fe_unit, fe_number, fe_category_id, fs_id from
+       ( select fec_id, fec_name
+         from fire_equipment_category fec limit #{page},#{pageSize})as b
+        left join fire_equipment fe on b.fec_id = fe.fe_category_id
+        where fec_name like #{condition}
+    </select>
+
+    <!--消防类别总数-->
+    <select id="equipmentCategoryAndResourceCount" resultType="java.lang.Integer">
+        select count(0) from fire_equipment_category where fec_name like #{condition}
+    </select>
+
+    <!--通过类别名称获取消防类别-->
+    <select id="selectByName" resultType="com.rzyc.fulongapi.model.FireEquipmentCategory">
+        select * from fire_equipment_category where fec_name = #{name}
+    </select>
+
+</mapper>

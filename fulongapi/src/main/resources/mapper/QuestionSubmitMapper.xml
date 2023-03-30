@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rzyc.fulongapi.mapper.QuestionSubmitMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.rzyc.fulongapi.model.QuestionSubmit">
+        <id column="qs_sub_id" property="qsSubId" />
+        <result column="danger_type" property="dangerType" />
+        <result column="qs_sub_desc" property="qsSubDesc" />
+        <result column="sub_user_name" property="subUserName" />
+        <result column="sub_user_phone" property="subUserPhone" />
+        <result column="qs_state" property="qsState" />
+        <result column="resolved_result" property="resolvedResult" />
+        <result column="create_time" property="createTime" />
+        <result column="building_id" property="buildingId"/>
+        <result column="create_by" property="createBy" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_by" property="modifyBy" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        qs_sub_id, danger_type, qs_sub_desc, sub_user_name, sub_user_phone, qs_state, resolved_result, create_time, create_by, modify_time, modify_by
+    </sql>
+
+    <select id="selectSubmitQuestionList" resultMap="BaseResultMap">
+        select qs_sub_id, danger_type, qs_sub_desc, sub_user_name, sub_user_phone, qs_state, resolved_result,building_id
+        from question_submit where 1=1
+        <if test="null != condition">
+            and sub_user_name like #{condition}
+            or qs_sub_desc like #{condition}
+            or resolved_result like #{condition}
+        </if>
+         limit #{page},#{pageSize}
+    </select>
+
+    <select id="selectSubmitQuestionListCount" resultType="java.lang.Long">
+        select count(0)
+        from question_submit where 1=1
+        <if test="null != condition">
+            and sub_user_name like #{condition}
+            or qs_sub_desc like #{condition}
+            or resolved_result like #{condition}
+        </if>
+    </select>
+
+    <!--未处理问题-->
+    <select id="findByQsState" resultMap="BaseResultMap">
+        SELECT * FROM `question_submit` qs WHERE qs.qs_state = 1
+        ORDER BY qs.`create_time` DESC;
+    </select>
+
+</mapper>

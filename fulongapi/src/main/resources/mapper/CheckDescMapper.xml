@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rzyc.fulongapi.mapper.CheckDescMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.rzyc.fulongapi.model.CheckDesc">
+        <id column="id" property="id" />
+        <result column="check_id" property="checkId" />
+        <result column="check_item_id" property="checkItemId" />
+        <result column="check_item_name" property="checkItemName" />
+        <result column="check_result" property="checkResult" />
+        <result column="create_time" property="createTime" />
+        <result column="create_by" property="createBy" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_by" property="modifyBy" />
+        <result column="danger_type_name" property="dangerTypeName" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, check_id, check_item_id, check_item_name, check_result, create_time, create_by, modify_time, modify_by
+    </sql>
+
+    <!--批量插入-->
+    <insert id="insertList">
+        insert into check_desc
+            (id, check_id, check_item_id, check_item_name,
+             check_result, create_time, create_by, modify_time, modify_by)
+             values
+            <foreach collection="records" item="record" separator=",">
+               (
+                #{record.id},#{record.checkId},#{record.checkItemId},#{record.checkItemName},#{record.checkResult},
+                #{record.createTime},#{record.createBy},#{record.modifyTime},#{record.modifyBy}
+                )
+            </foreach>
+    </insert>
+
+    <!--检查项详情-->
+    <select id="checkDescList" resultMap="BaseResultMap">
+        SELECT dt.`danger_type_name`, cd.*
+        FROM `check_desc` cd
+            LEFT JOIN `check_item` ct ON cd.`check_item_id` = ct.`item_id`
+            LEFT JOIN `danger_type` dt ON ct.`class_id` = dt.`danger_type_id`
+        WHERE cd.`check_id` = #{checkId}
+        ORDER BY dt.`sort_id` ASC
+    </select>
+
+</mapper>

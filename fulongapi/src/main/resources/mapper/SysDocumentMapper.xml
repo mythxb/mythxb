@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rzyc.fulongapi.mapper.SysDocumentMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.rzyc.fulongapi.model.SysDocument">
+        <id column="document_id" property="documentId" />
+        <result column="target_id" property="targetId" />
+        <result column="target_type" property="targetType" />
+        <result column="file_path" property="filePath" />
+        <result column="name" property="name" />
+        <result column="file_type" property="fileType" />
+        <result column="file_size" property="fileSize" />
+        <result column="created" property="created" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        document_id, target_id, target_type, file_path, name, file_type, file_size, created, create_time
+    </sql>
+
+    <!--查询文件列表-->
+    <select id="findByTargetId" resultMap="BaseResultMap">
+        select * from sys_document sd
+        where sd.target_type = #{targetType}
+          and sd.target_id in
+              <foreach collection="targetIds" open="(" close=")" separator="," item="targetId">
+                  #{targetId}
+              </foreach>
+        order by sd.create_time asc
+    </select>
+
+    <!--按月份查找图片-->
+    <select id="selectMonthImgs" resultType="hashmap">
+        SELECT DATE_FORMAT(create_time, '%Y-%m')AS monthTime,ds.`file_path` FROM `sys_document` ds
+        WHERE  ds.`created` = #{userId} and ds.target_type = 'registryImg'
+        ORDER BY ds.`create_time` DESC
+        LIMIT #{limitStart},#{limitEnd}
+    </select>
+</mapper>

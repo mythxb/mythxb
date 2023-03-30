@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rzyc.fulongapi.mapper.OrganizationMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.rzyc.fulongapi.model.Organization">
+        <id column="organization_id" property="organizationId" />
+        <result column="organization_name" property="organizationName" />
+        <result column="parent_id" property="parentId" />
+        <result column="organization_type" property="organizationType" />
+        <result column="person_name" property="personName" />
+        <result column="job_content" property="jobContent" />
+        <result column="create_time" property="createTime" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="create_by" property="createBy" />
+        <result column="modify_by" property="modifyBy" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        organization_id, organization_name, parent_id, organization_type, person_name, job_content, create_time, modify_time, create_by, modify_by
+    </sql>
+
+    <!--下级组织架构-->
+    <select id="findByParentId" resultMap="BaseResultMap">
+        select ot.* from organization ot where ot.parent_id = #{parentId}
+    </select>
+
+</mapper>

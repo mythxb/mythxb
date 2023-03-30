@@ -1,0 +1,553 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rzyc.fulongapi.mapper.CheckDangerMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.rzyc.fulongapi.model.CheckDanger">
+        <id column="id" property="id" />
+        <result column="check_id" property="checkId" />
+        <result column="check_desc_id" property="checkDescId" />
+        <result column="check_item" property="checkItem" />
+        <result column="rectify_info" property="rectifyInfo" />
+        <result column="check_proposal" property="checkProposal" />
+        <result column="normalorimportant" property="normalorimportant" />
+        <result column="rectification_state" property="rectificationState" />
+        <result column="building_id" property="buildingId" />
+        <result column="building_unit_id" property="buildingUnitId" />
+        <result column="danger_type_id" property="dangerTypeId" />
+        <result column="rectify_term" property="rectifyTerm" />
+        <result column="floor_fkey" property="floorFkey" />
+        <result column="check_type" property="checkType" />
+        <result column="create_time" property="createTime" />
+        <result column="create_by" property="createBy" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_by" property="modifyBy" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, check_id, check_desc_id, rectify_info, check_proposal,
+        check_item, normalorimportant, rectification_state, building_id, building_unit_id,
+        rectify_term,floor_fkey, check_type,create_time, create_by, modify_time, modify_by
+    </sql>
+
+    <!--隐患总数-->
+    <select id="countByState" resultType="java.lang.Integer">
+        SELECT count(*) FROM `check_danger` cd
+        WHERE 1= 1
+          <if test="null != rectificationState">
+              and cd.`rectification_state` = #{rectificationState}
+          </if>
+        <if test="null != buildIds and buildIds.size() > 0">
+            AND cd.`building_id` in
+            <foreach collection="buildIds" item="buildId" open="(" close=")" separator=",">
+                #{buildId}
+            </foreach>
+        </if>
+        <if test="null != unitIds and unitIds.size() > 0">
+            AND cd.`building_unit_id` in
+            <foreach collection="unitIds" item="unitId" open="(" close=")" separator=",">
+                #{unitId}
+            </foreach>
+        </if>
+
+    </select>
+
+    <!--企业隐患总数-->
+    <select id="countEntByState" resultType="java.lang.Integer">
+        SELECT count(*) FROM `check_danger` cd
+        WHERE 1= 1
+          <if test="null != rectificationState">
+              and cd.`rectification_state` = #{rectificationState}
+          </if>
+          and cd.floor_fkey = #{floorFkey}
+    </select>
+
+    <select id="mapDangersStatistic" resultType="com.rzyc.fulongapi.model.statistic.DangerStatistic">
+        select count(0) as dangerTotal,
+               SUM(case  when rectification_state = 1 then 1 else 0 end) as notRectifiedTotal,
+         SUM(case  when rectification_state = 2 then 1 else 0 end) as rectifyingTotal,
+               SUM(case  when rectification_state = 3 then 1 else 0 end) as rectifiedTotal,
+         SUM(case  when rectification_state = 4 then 1 else 0 end) as unableToRectify
+         from check_danger cd
+        left join building bd on cd.building_id = bd.build_id
+        left join build_unit bu on cd.building_unit_id = bu.unit_id
+          where 1=1
+         <if test="null != dangerType">
+            and cd.danger_type_id = #{dangerType}
+         </if>
+        <if test="null != unitId">
+            and bu.unit_id = #{unitId}
+        </if>
+    </select>
+
+    <select id="selectDanger" resultMap="DangerListResultMap">
+        select cd.id, cd.rectify_info, cd.check_proposal, cd.normalorimportant, cd.rectification_state,cd.check_item,
+        bd.build_name,bu.unit_name,bu.unit_manager,bu.unit_manager_contact
+        from check_danger cd
+         left join building bd on cd.building_id = bd.build_id
+         left join build_unit bu on cd.building_unit_id = bu.unit_id
+        where 1=1
+        <if test="null != buildingId">
+            and bd.build_id  = #{buildingId}
+        </if>
+        <if test="null != unitId">
+            and bu.unit_id  = #{unitId}
+        </if>
+        <if test="null != dangerType">
+             and cd.danger_type_id  = #{dangerType}
+        </if>
+        <if test="null != normalOrImportant">
+            and cd.normalorimportant  = #{normalOrImportant}
+        </if>
+        <if test="null != startTime and null != endTime">
+            and cd.create_time between startTime  and endTime
+        </if>
+        order by cd.create_time desc
+        limit #{page},#{pageSize}
+    </select>
+
+    <!--隐患等级数量-->
+    <select id="countByLevel" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM `check_danger` cd
+        WHERE cd.`normalorimportant` = #{level}
+        <if test="null != buildIds and buildIds.size() > 0">
+            AND cd.`building_id` in
+            <foreach collection="buildIds" item="buildId" open="(" close=")" separator=",">
+                #{buildId}
+            </foreach>
+        </if>
+        <if test="null != unitIds and unitIds.size() > 0">
+            AND cd.`building_unit_id` in
+            <foreach collection="unitIds" item="unitId" open="(" close=")" separator=",">
+                #{unitId}
+            </foreach>
+        </if>
+    </select>
+
+    <!--隐患等级数量-->
+    <select id="countEntByLevel" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM `check_danger` cd
+        WHERE cd.`normalorimportant` = #{level}
+        and cd.floor_fkey = #{floorFkey}
+    </select>
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="DangerListResultMap" type="com.rzyc.fulongapi.bean.check.DangerList">
+        <id column="id" property="id" />
+        <result column="check_id" property="checkId" />
+        <result column="check_desc_id" property="checkDescId" />
+        <result column="check_item" property="checkItem" />
+        <result column="rectify_info" property="rectifyInfo" />
+        <result column="check_proposal" property="checkProposal" />
+        <result column="normalorimportant" property="normalorimportant" />
+        <result column="rectification_state" property="rectificationState" />
+        <result column="building_id" property="buildingId" />
+        <result column="building_unit_id" property="buildingUnitId" />
+        <result column="danger_type_id" property="dangerTypeId" />
+        <result column="rectify_term" property="rectifyTerm" />
+        <result column="floor_fkey" property="floorFkey" />
+        <result column="check_type" property="checkType" />
+        <result column="create_time" property="createTime" />
+        <result column="create_by" property="createBy" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_by" property="modifyBy" />
+        <result column="build_name" property="buildName" />
+        <result column="unit_name" property="unitName" />
+        <result column="unit_number" property="unitNumber" />
+        <result column="unit_manager" property="unitManager" />
+        <result column="unit_manager_contact" property="unitManagerContact" />
+        <result column="floor_number" property="floorNumber" />
+        <result column="entName" property="entName" />
+        <result column="userName" property="userName" />
+        <result column="dangerTypeName" property="dangerTypeName" />
+        <result column="sb_name" property="sbName" />
+    </resultMap>
+
+    <!--隐患列表-->
+    <select id="dangerList" resultMap="DangerListResultMap">
+        SELECT bd.`build_name`,bu.`unit_name`,bu.`unit_number`,
+               bu.`unit_manager`,bu.`unit_manager_contact`,
+               bf.floor_number, se.ent_name entName,su.user_name userName,sb.sb_name,
+               dt.danger_type_name dangerTypeName,
+               cd.*
+        FROM `check_danger` cd
+            LEFT JOIN `build_floor` bf ON cd.`floor_fkey` = bf.`floor_id`
+            LEFT JOIN `build_unit` bu ON cd.`building_unit_id` = bu.`unit_id`
+            LEFT JOIN `building` bd ON cd.`building_id` = bd.`build_id`
+            left join enterprise se on se.enterprise_id = cd.floor_fkey
+            left join  special_building sb on sb.sb_id = cd.floor_fkey
+            left join sys_user su on cd.create_by = su.user_id
+            left join danger_type dt on cd.danger_type_id = dt.danger_type_id
+        where cd.check_item like #{condition}
+        <if test="null != buildIds and buildIds.size() > 0">
+            AND cd.`building_id` in
+            <foreach collection="buildIds" item="buildId" open="(" close=")" separator=",">
+                #{buildId}
+            </foreach>
+        </if>
+        <if test="null != unitIds and unitIds.size() > 0">
+            AND cd.`building_unit_id` in
+            <foreach collection="unitIds" item="unitId" open="(" close=")" separator=",">
+                #{unitId}
+            </foreach>
+        </if>
+        <if test="null != targetId and '' != targetId">
+            and cd.floor_fkey = #{targetId}
+        </if>
+        <if test="null != startTime and '' != startTime">
+            and cd.create_time >= #{startTime}
+        </if>
+        <if test="null != endTime and '' != endTime">
+            and cd.create_time &lt;= #{endTime}
+        </if>
+        <if test="null != state">
+            and cd.rectification_state = #{state}
+        </if>
+        <if test="null != riskLevel">
+            and cd.normalorimportant = #{riskLevel}
+        </if>
+        ORDER BY cd.`create_time` DESC
+    </select>
+
+    <!--隐患列表-->
+    <select id="entDangerList" resultMap="DangerListResultMap">
+        SELECT bd.`build_name`,bu.`unit_name`,bu.`unit_number`,
+        bu.`unit_manager`,bu.`unit_manager_contact`,
+        bf.floor_number, se.ent_name entName,su.user_name userName,sb.sb_name,
+        dt.danger_type_name dangerTypeName,
+        cd.*
+        FROM `check_danger` cd
+        LEFT JOIN `build_floor` bf ON cd.`floor_fkey` = bf.`floor_id`
+        LEFT JOIN `build_unit` bu ON cd.`building_unit_id` = bu.`unit_id`
+        LEFT JOIN `building` bd ON cd.`building_id` = bd.`build_id`
+        left join enterprise se on se.enterprise_id = cd.floor_fkey
+        left join  special_building sb on sb.sb_id = cd.floor_fkey
+        left join sys_user su on cd.create_by = su.user_id
+        left join danger_type dt on cd.danger_type_id = dt.danger_type_id
+        where cd.check_item like #{condition}
+        <if test="null != targetId and '' != targetId">
+            and cd.floor_fkey = #{targetId}
+        </if>
+        <if test="null != startTime and '' != startTime">
+            and cd.create_time >= #{startTime}
+        </if>
+        <if test="null != endTime and '' != endTime">
+            and cd.create_time &lt;= #{endTime}
+        </if>
+        <if test="null != state">
+            and cd.rectification_state = #{state}
+        </if>
+        <if test="null != riskLevel">
+            and cd.normalorimportant = #{riskLevel}
+        </if>
+        ORDER BY cd.`create_time` DESC
+    </select>
+
+
+    <!--隐患列表-->
+    <select id="dangerDetail" resultMap="DangerListResultMap">
+        SELECT bd.`build_name`,bu.`unit_name`,bu.`unit_number`,
+               bu.`unit_manager`,bu.`unit_manager_contact`,
+               bf.floor_number, se.ent_name entName,su.user_name userName,sb.sb_name,
+               dt.danger_type_name dangerTypeName,
+               cd.*
+        FROM `check_danger` cd
+                 LEFT JOIN `build_floor` bf ON cd.`floor_fkey` = bf.`floor_id`
+                 LEFT JOIN `build_unit` bu ON cd.`building_unit_id` = bu.`unit_id`
+                 LEFT JOIN `building` bd ON cd.`building_id` = bd.`build_id`
+                 left join enterprise se on se.enterprise_id = cd.floor_fkey
+                 left join  special_building sb on sb.sb_id = cd.floor_fkey
+                 left join sys_user su on cd.create_by = su.user_id
+                 left join danger_type dt on cd.danger_type_id = dt.danger_type_id
+        where cd.id = #{id}
+    </select>
+
+    <!--隐患数量-->
+    <select id="dangerData" resultType="java.lang.Integer">
+        SELECT count(*) FROM `check_danger` cd
+        WHERE cd.check_item like #{condition}
+        <if test="null != rectificationState">
+            and cd.`rectification_state` = #{rectificationState}
+        </if>
+
+    </select>
+
+    <!--修改隐患状态-->
+    <update id="changeState">
+        update check_danger
+            set rectification_state = #{record.rectificationState},
+            rectify_info = #{record.rectifyInfo}
+        where id = #{record.id}
+    </update>
+
+
+    <!--修改隐患状态-->
+    <update id="changeRectifyInfo">
+        update check_danger
+        set rectify_info = #{record.rectifyInfo}
+        where id = #{record.id}
+    </update>
+
+    <!--批量插入-->
+    <insert id="insertList">
+        insert into check_danger (id, check_id, check_desc_id, rectify_info, check_proposal,check_item,
+            normalorimportant, rectification_state, danger_type_id,rectify_term,building_id, building_unit_id,
+            floor_fkey,check_type, create_time, create_by, modify_time, modify_by)
+        values
+        <foreach collection="records" item="record" separator=",">
+            (
+            #{record.id},#{record.checkId},#{record.checkDescId},#{record.rectifyInfo},
+             #{record.checkProposal},
+             #{record.checkItem},
+            #{record.normalorimportant},
+            #{record.rectificationState},
+            #{record.dangerTypeId},
+            #{record.rectifyTerm},
+            #{record.buildingId},#{record.buildingUnitId},
+             #{record.floorFkey},
+             #{record.checkType},
+             #{record.createTime},
+            #{record.createBy},#{record.modifyTime},#{record.modifyBy}
+            )
+        </foreach>
+    </insert>
+
+    <!--单元隐患-->
+    <select id="findByUnitId" resultMap="BaseResultMap">
+        SELECT * FROM `check_danger` cd
+        WHERE cd.`building_unit_id` = #{unitId}
+        and cd.rectification_state in (1,2)
+    </select>
+
+
+    <select id="selectDangerTotal" resultType="java.lang.Long">
+        select  distinct  count(cd.id)
+        from check_danger cd
+        left join building bd on cd.building_id = bd.build_id
+
+        left join build_unit bu on cd.building_unit_id = bu.unit_id
+
+        where 1=1
+        <if test="null != buildingId">
+            and bd.build_id  = #{buildingId}
+        </if>
+        <if test="null != unitId">
+            and bu.unit_id  = #{unitId}
+        </if>
+        <if test="null != dangerType">
+            and cd.danger_type_id  = #{dangerType}
+        </if>
+        <if test="null != normalOrImportant">
+            and cd.normalorimportant  = #{normalOrImportant}
+        </if>
+        <if test="null != startTime and null != endTime">
+            and cd.create_time between startTime  and endTime
+        </if>
+    </select>
+    <!--楼栋隐患-->
+    <select id="findByBuildId" resultMap="BaseResultMap">
+        SELECT * FROM `check_danger` cd
+        WHERE cd.`building_id` = #{buildId}
+        and cd.rectification_state in (1,2)
+    </select>
+
+    <!--单元楼层隐患-->
+    <select id="findByFloorId" resultMap="BaseResultMap">
+        SELECT * FROM `check_danger` cd
+        WHERE cd.`floor_fkey` = #{floorId}
+        and cd.rectification_state in (1,2)
+    </select>
+
+
+    <!--所有隐患-->
+    <select id="findAll" resultMap="BaseResultMap">
+        SELECT * FROM `check_danger`
+    </select>
+
+    <!--修改隐患等级-->
+    <update id="changeLevel">
+        update check_danger
+        set rectification_state = #{record.normalorimportant}
+        where id = #{record.id}
+    </update>
+
+    <select id="findInfo" resultMap="BaseResultMap">
+        select id, check_id, check_desc_id, rectify_info, check_proposal,
+        check_item, normalorimportant, rectification_state, building_id, building_unit_id,
+        rectify_term,floor_fkey, check_type
+         from check_danger
+          where del_state = 1 and building_id = #{buildingId} and building_unit_id = #{buildingUnitId} and check_item = #{checkItem}
+    </select>
+
+    <update id="updateDelState" >
+        update check_danger set del_state = 2 where id = #{checkDangerId}
+    </update>
+
+    <select id="getBuildId" resultType="java.lang.String">
+        SELECT
+            build_id
+        FROM
+            building
+        WHERE
+            direction = #{direction} and build_number=#{buildNumber}  and build_name like '%${buildNumber}栋'
+    </select>
+
+    <select id="getUnitId" resultType="java.lang.String">
+        SELECT
+            unit_id
+        FROM
+            build_unit
+        WHERE
+            building_id=#{buildingId} and unit_number=#{unitNum}
+    </select>
+
+    <update id="updateRectificationState">
+        UPDATE check_danger
+        SET rectification_state = 1 where building_id=#{buildingId} and building_unit_id=#{buildingUnitId}
+    </update>
+
+    <!--隐患数量统计-->
+    <select id="countByTypeId" resultType="java.lang.Integer">
+        SELECT count(*) FROM `check_danger` cd
+        WHERE 1 = 1
+          <if test="null != unitId and '' != unitId">
+              AND cd.`building_unit_id` = #{unitId}
+          </if>
+
+          AND cd.`danger_type_id` in
+          <foreach collection="dangerTypeIds" separator="," open="(" close=")" item="dangerTypeId">
+             #{dangerTypeId}
+          </foreach>
+
+          <!--
+          <if test="null != dangerTypeId and '' != dangerTypeId">
+              AND cd.`danger_type_id` = #{dangerTypeId}
+          </if>
+          -->
+          <if test="null != rectificationState">
+              AND cd.rectification_state = #{rectificationState}
+          </if>
+    </select>
+
+    <resultMap id="DangerDataResultMap" type="com.rzyc.fulongapi.bean.check.DangerData">
+        <result column="totalNum" property="totalNum" />
+        <result column="notRectifyNum" property="notRectifyNum" />
+        <result column="rectifyingNum" property="rectifyingNum" />
+        <result column="rectifyNum" property="rectifyNum" />
+    </resultMap>
+
+    <!--消防隐患情况-->
+    <select id="fireDangerInfo" resultMap="DangerDataResultMap">
+        SELECT COUNT(0) AS totalNum,
+               SUM(CASE  WHEN rectification_state = 1 THEN 1 ELSE 0 END) AS notRectifyNum,
+               SUM(CASE  WHEN rectification_state = 2 THEN 1 ELSE 0 END) AS rectifyingNum,
+               SUM(CASE  WHEN rectification_state = 3 THEN 1 ELSE 0 END) AS rectifyNum
+        FROM check_danger cd
+        WHERE 1 = 1
+            <!--
+            cd.`danger_type_id` IN
+              <foreach collection="typeIds" item="typeId" separator="," open="(" close=")">
+                  #{typeId}
+              </foreach>
+              -->
+            <if test="null != unitId and '' != unitId">
+                AND cd.`building_unit_id` = #{unitId}
+            </if>
+    </select>
+
+
+    <!--消防隐患列表-->
+    <select id="fireDangerList" resultMap="DangerListResultMap">
+        SELECT bd.`build_name`,bu.`unit_name`,bu.`unit_number`,
+        bu.`unit_manager`,bu.`unit_manager_contact`,
+        bf.floor_number, se.ent_name entName,su.user_name userName,sb.sb_name,
+        dt.danger_type_name dangerTypeName,
+        cd.*
+        FROM `check_danger` cd
+        LEFT JOIN `build_floor` bf ON cd.`floor_fkey` = bf.`floor_id`
+        LEFT JOIN `build_unit` bu ON cd.`building_unit_id` = bu.`unit_id`
+        LEFT JOIN `building` bd ON cd.`building_id` = bd.`build_id`
+        left join enterprise se on se.enterprise_id = cd.floor_fkey
+        left join  special_building sb on sb.sb_id = cd.floor_fkey
+        left join sys_user su on cd.create_by = su.user_id
+        left join danger_type dt on cd.danger_type_id = dt.danger_type_id
+        where cd.check_item like #{condition}
+        <!--
+        and cd.`danger_type_id` IN
+        <foreach collection="typeIds" item="typeId" separator="," open="(" close=")">
+            #{typeId}
+        </foreach>
+        -->
+          <if test="null != dangerType">
+              AND dt.type = #{dangerType}
+          </if>
+        <if test="null != buildIds and buildIds.size() > 0">
+            AND cd.`building_id` in
+            <foreach collection="buildIds" item="buildId" open="(" close=")" separator=",">
+                #{buildId}
+            </foreach>
+        </if>
+        <if test="null != unitIds and unitIds.size() > 0">
+            AND cd.`building_unit_id` in
+            <foreach collection="unitIds" item="unitId" open="(" close=")" separator=",">
+                #{unitId}
+            </foreach>
+        </if>
+        <if test="null != targetId and '' != targetId">
+            and cd.floor_fkey = #{targetId}
+        </if>
+        <if test="null != startTime and '' != startTime">
+            and cd.create_time >= #{startTime}
+        </if>
+        <if test="null != endTime and '' != endTime">
+            and cd.create_time &lt;= #{endTime}
+        </if>
+        <if test="null != state">
+            and cd.rectification_state = #{state}
+        </if>
+        <if test="null != riskLevel">
+            and cd.normalorimportant = #{riskLevel}
+        </if>
+        ORDER BY cd.`create_time` DESC
+    </select>
+
+
+    <!--社区消防隐患类型统计-->
+    <resultMap id="FireControlTypeNumMap" type="com.rzyc.fulongapi.bean.fire.vo.FireControlTypeNum">
+        <result column="danger_type_name" property="typeName" />
+        <result column="dangerNum" property="dangerNum" />
+    </resultMap>
+
+    <!--社区消防隐患类型统计-->
+    <select id="fireControlTypeNum" resultMap="FireControlTypeNumMap">
+        SELECT dt.`danger_type_name`,COUNT(cd.`id`) dangerNum
+        FROM `check_danger` cd
+                 LEFT JOIN `danger_type` dt ON cd.`danger_type_id` = dt.`danger_type_id`
+        WHERE 1 = 1
+        <if test="null != dangerType">
+            and dt.`type` = #{dangerType}
+        </if>
+        GROUP BY dt.`danger_type_id`
+        ORDER BY dt.`sort_id` ASC
+    </select>
+
+    <!--通过隐患类型统计隐患数量-->
+    <select id="countByType" resultType="java.lang.Integer">
+        SELECT COUNT(cd.`id`)
+        FROM `check_danger` cd
+                 LEFT JOIN `danger_type` dt ON cd.`danger_type_id` = dt.`danger_type_id`
+        WHERE 1 = 1
+          <if test="null != dangerType">
+              and dt.`type` = #{dangerType}
+          </if>
+        <if test="null != rectificationState">
+            AND cd.rectification_state = #{rectificationState}
+        </if>
+        <if test="null != unitId and '' != unitId">
+            and cd.building_unit_id = #{unitId}
+        </if>
+
+    </select>
+
+</mapper>

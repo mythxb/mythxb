@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rzyc.fulongapi.mapper.BuildUnitMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.rzyc.fulongapi.model.BuildUnit">
+        <id column="unit_id" property="unitId" />
+        <result column="unit_manager" property="unitManager" />
+        <result column="unit_manager_contact" property="unitManagerContact" />
+        <result column="building_id" property="buildingId" />
+        <result column="unit_number" property="unitNumber" />
+        <result column="unit_name" property="unitName" />
+        <result column="qr_code" property="qrCode" />
+        <result column="risk_level" property="riskLevel" />
+        <result column="floor_count" property="floorCount" />
+        <result column="create_time" property="createTime" />
+        <result column="create_by" property="createBy" />
+        <result column="modify_by" property="modifyBy" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="build_name" property="buildName"/>
+        <result column="personNum" property="personNum"/>
+        <result column="dangerNum" property="dangerNum"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        unit_id, unit_manager, unit_manager_contact,
+        building_id, unit_number, unit_name, floor_count,qr_code,risk_level
+        create_time, create_by, modify_by, modify_time
+    </sql>
+
+    <select id="selectBuildingUnitsInfo" resultMap="BaseResultMap">
+        select bu.unit_id, bu.unit_manager, bu.unit_manager_contact, bu.building_id, bu.unit_number, bu.unit_name, bu.floor_count,sum(person_num) as personNum
+        from build_unit bu left join build_floor bf on bu.unit_id = bf.unit_id
+        where  bu.building_id = #{buildingId}
+        group by bu.unit_id
+        order by bu.unit_number
+        limit #{page},#{pageSize}
+    </select>
+
+
+    <!--单元列表-->
+    <resultMap id="UnitResultMap" type="com.rzyc.fulongapi.model.BuildUnit">
+        <id column="unit_id" property="unitId" />
+        <result column="unit_manager" property="unitManager" />
+        <result column="unit_manager_contact" property="unitManagerContact" />
+        <result column="building_id" property="buildingId" />
+        <result column="unit_number" property="unitNumber" />
+        <result column="unit_name" property="unitName" />
+        <result column="floor_count" property="floorCount" />
+        <result column="qr_code" property="qrCode" />
+        <result column="risk_level" property="riskLevel" />
+        <result column="create_time" property="createTime" />
+        <result column="create_by" property="createBy" />
+        <result column="modify_by" property="modifyBy" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="build_name" property="buildName" />
+        <result column="build_number" property="buildNumber" />
+    </resultMap>
+
+    <!--单元列表-->
+    <select id="unitList" resultMap="UnitResultMap">
+        SELECT bd.`build_name`,bd.`build_number`,bu.*
+        FROM `build_unit` bu
+            LEFT JOIN `building` bd ON bu.`building_id` = bd.`build_id`
+        WHERE (bd.`build_name` LIKE #{condition} OR bu.`unit_manager` LIKE #{condition})
+          <if test="null != buildingId and '' != buildingId">
+              AND bu.`building_id` = #{buildingId}
+          </if>
+            <if test="null != unitId and '' != unitId">
+                and unit_id = #{unitId}
+            </if>
+        ORDER BY bd.direction asc,bd.build_number asc,bu.unit_number asc,bu.`unit_id` ASC
+    </select>
+
+    <resultMap id="unitInfoAndDanger" type="com.rzyc.fulongapi.model.BuildUnit">
+        <id column="unit_id" property="unitId" />
+        <result column="unit_manager" property="unitManager" />
+        <result column="unit_manager_contact" property="unitManagerContact" />
+        <result column="building_id" property="buildingId" />
+        <result column="unit_number" property="unitNumber" />
+        <result column="unit_name" property="unitName" />
+        <result column="floor_count" property="floorCount" />
+        <result column="create_time" property="createTime" />
+        <result column="create_by" property="createBy" />
+        <result column="modify_by" property="modifyBy" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="build_name" property="buildName"/>
+        <result column="risk_level" property="riskLevel"/>
+        <result column="person_num" property="personNum" />
+        <result column="cooker_num" property="cookerNum"/>
+        <result column="heater_num" property="heaterNum"/>
+    </resultMap>
+
+    <select id="selectBuildingUnitDetail" resultMap="unitInfoAndDanger">
+        select t1.unit_id, unit_manager, unit_manager_contact, t1.building_id, t1.unit_number, unit_name, floor_count,
+        t2.build_name,t1.risk_level,sum(t3.person_num) as person_num,
+        sum(t3.cooker_num) as cooker_num, sum(t3.heater_num) as heater_num
+        from build_unit t1
+        left join building  t2 on t1.building_id = t2.build_id
+        left join build_floor t3 on t1.unit_id = t3.unit_id
+        where t1.unit_id = #{unitId}
+    </select>
+
+    <select id="selectByBuildingOrUnitId" resultMap="BaseResultMap">
+        select t1.unit_id
+        from  build_unit t1
+        left join  building t2 on t2.build_id = t1.building_id
+        where t2.direction = #{direction} and t2.build_number = #{buildingNumber} and t1.unit_number = #{unitNumber}
+    </select>
+    <!--修改二维码-->
+    <update id="changeQrCode">
+        update build_unit set qr_code = #{qrCode} where unit_id = #{unitId}
+    </update>
+
+    <!--修改风险等级-->
+    <update id="changeRiskLevel">
+        update build_unit set risk_level = #{riskLevel} where unit_id = #{unitId}
+    </update>
+
+    <!--查询所有-->
+    <select id="findAll" resultMap="BaseResultMap">
+        select * from build_unit
+    </select>
+
+    <!--楼栋下单元-->
+    <select id="findByBuildingId" resultMap="BaseResultMap">
+        SELECT * FROM `build_unit` bu
+        WHERE bu.`building_id` = #{buildingId}
+          AND bu.`unit_number` = #{unitNumber}
+    </select>
+
+    <select id="selectBuildingUnitsInfoTotal" resultType="java.lang.Long">
+         select count(0)
+        from build_unit bu
+        where  bu.building_id = #{buildingId}
+    </select>
+
+    <!--总户数-->
+    <select id="sumFloor" resultType="java.lang.Integer">
+        SELECT SUM(household_size) FROM `build_floor`
+    </select>
+
+    <select id="selectByParentAndNumber" resultMap="BaseResultMap">
+        select * from build_unit where building_id = #{buildingId} and unit_number = #{unitNumber}
+    </select>
+
+    <update id="updateManager">
+        update build_unit set unit_manager = #{bd.householderName},unit_manager_contact = #{bd.householderPhone}
+        where  unit_id = #{bd.buildingUnitId}
+    </update>
+
+    <select id="selectTheseNullFloorUnits" resultMap="BaseResultMap">
+        select bu.building_id,bu.unit_id,bu.unit_number,bu.floor_count from build_unit bu
+        left join build_floor bf on bu.unit_id = bf.unit_id
+        left join building bd  on bu.building_id = bd.build_id
+        GROUP BY bu.unit_id  having count(bf.floor_id) &lt; 1
+    </select>
+
+
+    <!--单元列表-->
+    <select id="unitListPage" resultMap="UnitResultMap">
+        SELECT bd.`build_name`,bd.`build_number`,bu.*
+        FROM `build_unit` bu
+        LEFT JOIN `building` bd ON bu.`building_id` = bd.`build_id`
+        WHERE (bd.`build_name` LIKE #{condition} OR bu.`unit_manager` LIKE #{condition})
+          <if test="null != buildIds and buildIds.size() > 0">
+              AND bu.`building_id` in
+              <foreach collection="buildIds" item="buildId" open="(" close=")" separator=",">
+                  #{buildId}
+              </foreach>
+          </if>
+        <if test="null != unitIds and unitIds.size() > 0">
+            AND bu.`unit_id` in
+            <foreach collection="unitIds" item="unitId" open="(" close=")" separator=",">
+                #{unitId}
+            </foreach>
+        </if>
+        <if test="null != buildingId and '' != buildingId">
+            AND bu.`building_id` = #{buildingId}
+        </if>
+        <if test="null != unitId and '' != unitId">
+            and unit_id = #{unitId}
+        </if>
+        ORDER BY bd.direction asc,bd.build_number asc,
+                 bu.unit_number asc,bu.`unit_id` ASC
+    </select>
+
+    <!--修改单元信息-->
+    <select id="changeManger">
+        UPDATE `build_unit`
+        SET unit_manager = #{unitManager},
+            unit_manager_contact = #{unitManagerContact}
+        WHERE building_id = #{buildingId} AND unit_number = #{unitNumber}
+    </select>
+
+    <select id="selectBuildingAndUnitNumber" resultType="com.rzyc.fulongapi.model.BuildUnit">
+        select t1.build_id buildingId,t2.unit_id unitId
+        from building t1
+                 left join build_unit t2 on t1.build_id = t2.building_id
+
+        where t1.direction = #{direction} and t1.build_number = #{buildingNumber}
+          and t2.unit_number = #{unitNumber}
+    </select>
+
+    <!--单元隐患情况-->
+    <select id="unitDangerNum" resultMap="BaseResultMap">
+        SELECT
+            bd.`build_name`,
+            bu.*,
+            (
+                SELECT COUNT(cd.id)
+                FROM `check_danger` cd
+                         LEFT JOIN `danger_type` dt ON cd.danger_type_id = dt.danger_type_id
+                WHERE 1 = 1
+                  <if test="null != dangerType">
+                      AND dt.type = #{dangerType}
+                  </if>
+                  AND cd.rectification_state != 3
+            AND cd.building_unit_id = bu.`unit_id`
+            ) dangerNum
+
+
+        FROM `build_unit` bu
+            LEFT JOIN `building` bd ON bu.`building_id` = bd.`build_id`
+        ORDER BY bd.direction ASC,bd.build_number ASC, bu.`unit_number` ASC
+    </select>
+</mapper>

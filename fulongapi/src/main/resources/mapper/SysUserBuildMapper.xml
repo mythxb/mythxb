@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rzyc.fulongapi.mapper.SysUserBuildMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.rzyc.fulongapi.model.SysUserBuild">
+        <id column="relation_id" property="relationId" />
+        <result column="user_id" property="userId" />
+        <result column="target_id" property="targetId" />
+        <result column="relation_type" property="relationType" />
+        <result column="create_time" property="createTime" />
+        <result column="create_by" property="createBy" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        relation_id, user_id, target_id, relation_type, create_time, create_by
+    </sql>
+
+    <!--用户的楼栋 或者 单元-->
+    <select id="findByUserId" resultMap="BaseResultMap">
+        SELECT * FROM `sys_user_build` ub
+        WHERE ub.`user_id` = #{userId}
+          AND ub.`relation_type` = #{relationType}
+
+    </select>
+
+</mapper>

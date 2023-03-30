@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rzyc.fulongapi.mapper.FireStationMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.rzyc.fulongapi.model.FireStation">
+        <id column="fs_id" property="fsId" />
+        <result column="fs_name" property="fsName" />
+        <result column="fs_address" property="fsAddress" />
+        <result column="fs_contact" property="fsContact" />
+        <result column="fs_manager" property="fsManager"/>
+        <result column="create_time" property="createTime" />
+        <result column="create_by" property="createBy" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_by" property="modifyBy" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        fs_id, fs_name, fs_address, fs_contact, create_time, create_by, modify_time, modify_by
+    </sql>
+
+    <!--消防站列表-->
+    <select id="fireStations" resultMap="BaseResultMap">
+        select  fs_id, fs_name, fs_address, fs_contact,fs_manager from fire_station
+        where fs_name LIKE #{condition} or fs_address LIKE #{condition} or fs_contact  LIKE #{condition} or fs_manager LIKE #{condition}
+        <if test="null != page and null != pageSize">
+            limit #{page},#{pageSize}
+        </if>
+    </select>
+
+    <!--消防站总数-->
+    <select id="fireStationsCount" resultType="java.lang.Integer">
+        select count(0)  from  fire_station
+        where fs_name LIKE #{condition} or fs_address LIKE #{condition} or fs_contact  LIKE #{condition} or fs_manager LIKE #{condition}
+    </select>
+
+</mapper>

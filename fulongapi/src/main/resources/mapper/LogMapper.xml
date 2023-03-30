@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rzyc.fulongapi.mapper.LogMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.rzyc.fulongapi.model.Log">
+        <id column="id" property="id" />
+        <result column="ip" property="ip" />
+        <result column="user_id" property="userId" />
+        <result column="behavior" property="behavior" />
+        <result column="parameter" property="parameter" />
+        <result column="response_str" property="responseStr" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, ip, user_id, behavior, parameter, response_str, create_time
+    </sql>
+
+    <select id="logList" resultMap="BaseResultMap">
+        select * from log where  1=1
+        <if test="null != behavior">
+            and behavior = #{behavior}
+        </if>
+        <if test="null != param">
+            and parameter like  concat('%',#{param},'%')
+        </if>
+        <if test="null != startTime">
+            and create_time >= #{startTime}
+        </if>
+        <if test="null != endTime">
+            and create_time &lt;= #{endTime}
+        </if>
+        order by create_time desc
+        limit #{page},#{pageSize}
+    </select>
+
+    <select id="logListCount" resultType="java.lang.Long">
+        select count(0) from log where  1=1
+        <if test="null != behavior">
+            and behavior = #{behavior}
+        </if>
+        <if test="null != param">
+            and parameter like  concat('%',#{param},'%')
+        </if>
+        <if test="null != startTime">
+            and create_time >= #{startTime}
+        </if>
+        <if test="null != endTime">
+            and create_time &lt;= #{endTime}
+        </if>
+
+    </select>
+
+</mapper>

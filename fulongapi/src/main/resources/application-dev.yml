@@ -1,0 +1,47 @@
+server:
+  port: 5668
+  max-http-header-size: 1024000
+spring:
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 2GB
+      max-request-size: 2GB
+  jackson:
+    time-zone: GMT+8
+  application:
+    name: fulong
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://121.40.106.103:3306/hyfulong_platform?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8&useSSL=false
+    username: ENC(x12esw0FeCXfJkEVNVPWEA==)
+    password: ENC(GcYwwWW4jYu4EKeY1tiGdJbC1/9/F13WHjoyr3K24DA=)
+    tomcat:
+      max-active: 10
+      min-idle: 10
+      initial-size: 2
+    hikari:
+      minimum-idle: 3
+      maximum-pool-size: 10
+      max-lifetime: 30000
+      connection-test-query: SELECT 1
+logging:
+  level:
+    com.rzyc.fulongapi.mapper: debug
+
+
+jasypt:
+  encryptor:
+    password: rzyc2022
+
+
+
+#自定义配置
+onstants:
+  #上传文件存放地址
+  file_location: C:/mnt/resource/fulong/uploadFile/
+  #文件拼接地址
+  file_header: /resource/fulong/uploadFile/
+  #文件服务器地址
+  service_file_header: http://121.40.106.103/
+

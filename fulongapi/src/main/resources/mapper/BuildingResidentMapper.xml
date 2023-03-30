@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rzyc.fulongapi.mapper.BuildingResidentMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.rzyc.fulongapi.model.BuildingResident">
+        <id column="resident_id" property="residentId" />
+        <result column="resident_name" property="residentName" />
+        <result column="resident_phone" property="residentPhone" />
+        <result column="resident_identity_card" property="residentIdentityCard" />
+        <result column="resident_type" property="residentType" />
+        <result column="work_place" property="workPlace" />
+        <result column="floor_id" property="floorId" />
+        <result column="building_unit_id" property="buildingUnitId"/>
+        <result column="create_time" property="createTime" />
+        <result column="create_by" property="createBy" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="modify_by" property="modifyBy" />
+        <result column="createByName" property="createByName"/>
+        <result column="modifyByName" property="modifyByName"/>
+        <result column="building_id" property="buildingId"/>
+        <result column="floor_number" property="floorNumber"/>
+        <result column="build_name" property="buildName"/>
+        <result column="unit_name" property="unitName"/>
+        <result column="status" property="status"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        resident_id, resident_name, resident_phone, resident_identity_card, resident_type, work_place, floor_id, create_time, create_by, modify_time, modify_by
+    </sql>
+
+    <select id="selectResidentList" resultMap="BaseResultMap">
+        select  br.resident_id, br.resident_name, br.resident_phone, br.resident_identity_card, br.resident_type, br.work_place,
+        br.floor_id,br.building_unit_id,bu.building_id,bf.floor_number,br.status,
+               b.build_name
+         from  building_resident br
+         left join  build_floor bf on br.floor_id = bf.floor_id
+         left join build_unit bu on br.building_unit_id = bu.unit_id
+        left join building as b on b.build_id = bu.building_id
+         where  1=1
+         <if test="null != unitId">
+             and br.building_unit_id = #{unitId}
+         </if>
+        <if test="null != floorId">
+            and br.floor_id = #{floorId}
+        </if>
+        <if test="null != residentType">
+            and br.resident_type = #{residentType}
+        </if>
+        <if test="null != residentName">
+            and br.resident_name like concat('%',#{residentName},'%')
+        </if>
+        <if test="null != condition">
+            and (
+            br.resident_phone like #{condition}
+            or br.resident_name like #{condition}
+            or br.work_place like #{condition}
+            )
+        </if>
+          order by br.create_time asc
+          limit #{page},#{pageSize}
+    </select>
+
+    <select id="selectResidentCount" resultType="java.lang.Long">
+        select  count(0)
+         from  building_resident  br where  1=1 and br.status=1
+        <if test="null != unitId">
+            and br.building_unit_id = #{unitId}
+        </if>
+        <if test="null != floorId">
+            and br.floor_id = #{floorId}
+        </if>
+        <if test="null != residentType">
+            and br.resident_type = #{residentType}
+        </if>
+        <if test="null != residentName">
+            and br.resident_name like concat('%',#{residentName},'%')
+        </if>
+        <if test="null != condition">
+            and (
+            br.resident_phone like #{condition}
+            or br.resident_name like #{condition}
+            or br.work_place like #{condition}
+            )
+        </if>
+    </select>
+
+    <delete id="deleteByUnitOrFloor" >
+        delete from building_resident where  1=1
+        <if test="null != unitId and '' != unitId ">
+            and building_unit_id = #{unitId}
+        </if>
+        <if test="null != floorId and '' != floorId ">
+            and floor_id = #{floorId}
+        </if>
+    </delete>
+
+    <!--大屏小区住房信息，房屋类型的总数-->
+    <select id="selectResidentTypeTotal" resultType="com.rzyc.fulongapi.bean.map.ResidentTypeTotalVo">
+        SELECT
+            br.resident_type residentType,
+            COUNT( resident_id ) housesTotal
+        FROM
+            building_resident br
+        WHERE
+            br.resident_type != ''
+        GROUP BY
+            br.resident_type
+    </select>
+
+    <!--小区住房信息人口数-->
+    <select id="selectResidentTotal" resultType="java.lang.Long">
+        SELECT count(0) population FROM building_resident
+    </select>
+
+    <!--大屏小区住房分页列表-->
+    <select id="selectHousingInfoList" resultType="com.rzyc.fulongapi.bean.map.ResidentDetailVo">
+        SELECT
+        bg.build_name buildName,
+        bu.unit_name unitName,
+        bu.unit_manager unitManager,
+        bu.unit_manager_contact unitManagerContact,
+        bg.building_manager buildingManager,
+        bg.building_manager_contact buildingManagerContact
+        FROM
+        build_floor bf
+        LEFT JOIN building bg ON bf.building_id = bg.build_id
+        LEFT JOIN build_unit bu on bf.unit_id = bu.unit_id
+        where
+        1 = 1
+        <if test="condition!=null">
+            AND (
+            bg.build_name LIKE #{condition}
+            OR bu.unit_name LIKE #{condition}
+            OR bu.unit_manager LIKE #{condition}
+            OR bu.unit_manager_contact LIKE #{condition}
+            OR bg.building_manager LIKE #{condition}
+            OR bg.building_manager_contact LIKE #{condition}
+            )
+        </if>
+    </select>
+
+    <!--所有数据-->
+    <select id="findAll" resultMap="BaseResultMap">
+        SELECT * FROM `building_resident`
+    </select>
+
+    <!--人口类型信息-->
+    <resultMap id="PopulationTypeResultMap" type="com.rzyc.fulongapi.bean.user.PopulationType">
+        <result column="selfUseNum" property="selfUseNum" />
+        <result column="leaseNum" property="leaseNum" />
+        <result column="commercialNum" property="commercialNum" />
+    </resultMap>
+
+    <!--人口类型分布信息-->
+    <select id="populationTypeV1" resultMap="PopulationTypeResultMap">
+        SELECT
+            SUM(CASE WHEN br.`resident_type` = 1 THEN 1 ELSE 0 END )  selfUseNum,
+            SUM(CASE WHEN br.`resident_type` = 2 THEN 1 ELSE 0 END )  liveNum,
+            SUM(CASE WHEN br.`resident_type` = 3 THEN 1 ELSE 0 END )  sharingNum,
+            SUM(CASE WHEN br.`resident_type` = 4 THEN 1 ELSE 0 END )  leaseNum,
+            SUM(CASE WHEN br.`resident_type` = 5 THEN 1 ELSE 0 END )  wholeRentNum,
+            SUM(CASE WHEN br.`resident_type` = 6 THEN 1 ELSE 0 END )  commercialNum
+        FROM `building_resident` br
+    </select>
+
+    <!--住户信息-->
+    <select id="residentList" resultMap="BaseResultMap">
+        SELECT bl.`build_name`, bu.`unit_name`, br.*
+        FROM `building_resident` br
+                 LEFT JOIN `build_unit` bu ON br.`building_unit_id` = bu.`unit_id`
+                 LEFT JOIN `building` bl ON bu.`building_id` = bl.`build_id`
+        WHERE br.`resident_name` LIKE #{condition}
+        ORDER BY br.`resident_id` ASC, br.`modify_time` DESC
+    </select>
+
+    <!--房屋总数-->
+    <select id="countByResidentType" resultType="java.lang.Integer">
+        SELECT COUNT(DISTINCT br.floor_id)
+        FROM `building_resident` br
+        WHERE br.`resident_type` IN
+              <foreach collection="residentTypes" item="residentType" close=")" open="(" separator=",">
+                  #{residentType}
+              </foreach>
+    </select>
+
+</mapper>

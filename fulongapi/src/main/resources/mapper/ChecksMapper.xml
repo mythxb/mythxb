@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rzyc.fulongapi.mapper.ChecksMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.rzyc.fulongapi.model.Checks">
+        <id column="check_id" property="checkId" />
+        <result column="building_id" property="buildingId" />
+        <result column="building_unit_id" property="buildingUnitId" />
+        <result column="floor_fkey" property="floorFkey" />
+        <result column="at_floor" property="atFloor" />
+        <result column="check_user_id" property="checkUserId" />
+        <result column="check_time" property="checkTime" />
+        <result column="list_id" property="listId" />
+        <result column="remark" property="remark" />
+        <result column="check_type" property="checkType" />
+        <result column="create_time" property="createTime" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="create_by" property="createBy" />
+        <result column="modify_by" property="modifyBy" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        check_id, building_id, building_unit_id, floor_fkey, at_floor, check_user_id,
+        check_time, list_id, remark, check_type,create_time, modify_time, create_by, modify_by
+    </sql>
+
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="CheckResultMap" type="com.rzyc.fulongapi.bean.check.ChecksList">
+        <result column="check_id" property="checkId" />
+        <result column="building_id" property="buildingId" />
+        <result column="building_unit_id" property="buildingUnitId" />
+        <result column="floor_fkey" property="floorFkey" />
+        <result column="at_floor" property="atFloor" />
+        <result column="check_user_id" property="checkUserId" />
+        <result column="check_time" property="checkTime" />
+        <result column="list_id" property="listId" />
+        <result column="remark" property="remark" />
+        <result column="check_type" property="checkType" />
+        <result column="create_time" property="createTime" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="create_by" property="createBy" />
+        <result column="modify_by" property="modifyBy" />
+        <result column="user_name" property="userName" />
+        <result column="build_name" property="buildName" />
+        <result column="unit_manager" property="unitManager" />
+        <result column="unit_name" property="unitName" />
+        <result column="floor_number" property="floorNumber" />
+        <result column="entName" property="entName" />
+        <result column="sbName" property="sbName"/>
+    </resultMap>
+
+    <!--检查列表-->
+    <select id="checkList" resultMap="CheckResultMap">
+        SELECT su.`user_name`, bd.`build_name`,bu.`unit_manager`,
+               bu.`unit_name`, bf.`floor_number`,se.ent_name entName,
+               sb.sb_name sbName,
+               ck.*
+        FROM `checks` ck
+                 LEFT JOIN `build_floor` bf ON ck.`floor_fkey` = bf.`floor_id`
+                 LEFT JOIN `build_unit` bu ON ck.`building_unit_id` = bu.`unit_id`
+                 LEFT JOIN `building` bd ON ck.`building_id` = bd.`build_id`
+                 LEFT JOIN sys_user su ON ck.`create_by` = su.`user_id`
+                 left join enterprise se on se.enterprise_id = ck.floor_fkey
+                 left join special_building sb on sb.sb_id = ck.floor_fkey
+        WHERE (bd.`building_time` LIKE #{condition}
+                   OR bu.`unit_manager` LIKE #{condition}
+                   OR bu.`unit_name` LIKE #{condition}
+                   OR su.`user_name` LIKE #{condition}
+                )
+        <if test="null != buildIds and buildIds.size() > 0">
+            AND se.`building_id` in
+            <foreach collection="buildIds" item="buildId" open="(" close=")" separator=",">
+                #{buildId}
+            </foreach>
+        </if>
+        <if test="null != unitIds and unitIds.size() > 0">
+            AND se.`building_unit_id` in
+            <foreach collection="unitIds" item="unitId" open="(" close=")" separator=",">
+                #{unitId}
+            </foreach>
+        </if>
+        <if test="null != startTime and '' != startTime">
+            and ck.`create_time` >= #{startTime}
+        </if>
+        <if test="null != endTime and '' != endTime">
+            and ck.`create_time` &lt;= #{endTime}
+        </if>
+        ORDER BY ck.`create_time` DESC
+    </select>
+
+
+    <!--检查列表-->
+    <select id="encCheckList" resultMap="CheckResultMap">
+        SELECT su.`user_name`, bd.`build_name`,bu.`unit_manager`,
+        bu.`unit_name`, bf.`floor_number`,se.ent_name entName,
+        sb.sb_name sbName,
+        ck.*
+        FROM `checks` ck
+        LEFT JOIN `build_floor` bf ON ck.`floor_fkey` = bf.`floor_id`
+        LEFT JOIN `build_unit` bu ON ck.`building_unit_id` = bu.`unit_id`
+        LEFT JOIN `building` bd ON ck.`building_id` = bd.`build_id`
+        LEFT JOIN sys_user su ON ck.`create_by` = su.`user_id`
+        left join enterprise se on se.enterprise_id = ck.floor_fkey
+        left join special_building sb on sb.sb_id = ck.floor_fkey
+        WHERE (bd.`building_time` LIKE #{condition}
+        OR bu.`unit_manager` LIKE #{condition}
+        OR bu.`unit_name` LIKE #{condition}
+        OR su.`user_name` LIKE #{condition}
+        )
+        and ck.floor_fkey = #{floorFkey}
+        <if test="null != startTime and '' != startTime">
+            and ck.`create_time` >= #{startTime}
+        </if>
+        <if test="null != endTime and '' != endTime">
+            and ck.`create_time` &lt;= #{endTime}
+        </if>
+        ORDER BY ck.`create_time` DESC
+    </select>
+
+
+
+    <!--检查列表-->
+    <select id="checkDetail" resultMap="CheckResultMap">
+        SELECT su.`user_name`, bd.`build_name`,bu.`unit_manager`,bu.`unit_name`, bf.`floor_number`, ck.*
+        FROM `checks` ck
+                 LEFT JOIN `build_floor` bf ON ck.`floor_fkey` = bf.`floor_id`
+                 LEFT JOIN `build_unit` bu ON ck.`building_unit_id` = bu.`unit_id`
+                 LEFT JOIN `building` bd ON ck.`building_id` = bd.`build_id`
+                 LEFT JOIN sys_user su ON ck.`create_by` = su.`user_id`
+        WHERE ck.check_id = #{checkId}
+    </select>
+
+</mapper>

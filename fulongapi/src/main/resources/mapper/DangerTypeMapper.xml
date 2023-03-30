@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rzyc.fulongapi.mapper.DangerTypeMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.rzyc.fulongapi.model.DangerType">
+        <result column="danger_type_id" property="dangerTypeId" />
+        <result column="danger_type_name" property="dangerTypeName" />
+        <result column="sort_id" property="sortId" />
+        <result column="create_time" property="createTime" />
+        <result column="create_by" property="createBy" />
+        <result column="totalNum" property="totalNum" />
+        <result column="rectifyNum" property="rectifyNum" />
+        <result column="rectifyNum" property="rectifyNum" />
+        <result column="rectifyingNum" property="rectifyingNum" />
+        <!--<result column="dangerCount" property="dangerCount" />-->
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        danger_type_id, danger_type_name,type, create_time, create_by
+    </sql>
+
+
+    <select id="selectByDangerType" resultMap="BaseResultMap">
+        select danger_type_id, danger_type_name, create_time, create_by from  danger_type where danger_type_name = #{dangerType}
+    </select>
+
+    <select id="selectDangerTypes" resultMap="BaseResultMap">
+        select dt.danger_type_id, danger_type_name,count(cd.id) as dangerCount,sort_id from
+        danger_type dt
+         left join check_danger cd on dt.danger_type_id = cd.danger_type_id
+        left join building bd on cd.building_id = bd.build_id
+        left join build_unit bu on cd.building_unit_id = bu.unit_id
+        where 1=1
+        <if test="unitId">
+            and  bu.unit_id = #{unitId}
+        </if>
+         group by danger_type_id
+         order by dt.sort_id asc
+    </select>
+
+    <!--查询隐患分类-->
+    <select id="findByIndex" resultMap="BaseResultMap">
+        select * from danger_type dt
+        order by dt.sort_id asc
+        limit #{index}
+    </select>
+
+    <select id="allDangerTypes" resultMap="BaseResultMap">
+        select danger_type_id, danger_type_name,`type` from danger_type where 1=1
+        <if test="null != type">
+            and `type` = #{type}
+        </if>
+    </select>
+
+    <!--隐患数量统计-->
+    <select id="dangerNumInfo" resultMap="BaseResultMap">
+        SELECT dt.*,
+
+               (
+                   SELECT COUNT(*) FROM `check_danger` cd
+                   WHERE cd.danger_type_id = dt.`danger_type_id`
+                   <if test="null != unitId and '' != unitId">
+                       AND cd.`building_unit_id` = #{unitId}
+                   </if>
+               ) totalNum,
+               (
+                   SELECT COUNT(*) FROM `check_danger` cd
+                   WHERE cd.danger_type_id = dt.`danger_type_id`
+                    <if test="null != unitId and '' != unitId">
+                        AND cd.`building_unit_id` = #{unitId}
+                    </if>
+                     AND cd.rectification_state = 3
+               ) rectifyNum,
+               (
+                   SELECT COUNT(*) FROM `check_danger` cd
+                   WHERE cd.danger_type_id = dt.`danger_type_id`
+                    <if test="null != unitId and '' != unitId">
+                        AND cd.`building_unit_id` = #{unitId}
+                    </if>
+                     AND cd.rectification_state = 2
+               ) rectifyingNum
+
+        FROM `danger_type` dt
+        ORDER BY dt.`sort_id` ASC LIMIT 3
+    </select>
+
+    <!--单元消防信息-->
+    <select id="unitDnagerInfo" resultMap="BaseResultMap">
+        SELECT DISTINCT dt.*
+        FROM `check_danger` cd
+            LEFT JOIN `danger_type` dt ON cd.danger_type_id = dt.danger_type_id
+        WHERE cd.`building_unit_id` = #{unitId}
+          <if test="null != dangerType">
+              AND dt.`type` = #{dangerType}
+          </if>
+    </select>
+
+</mapper>

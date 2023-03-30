@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rzyc.fulongapi.mapper.NewsContentMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.rzyc.fulongapi.model.NewsContent">
+        <id column="content_id" property="contentId" />
+        <result column="news_id" property="newsId" />
+        <result column="content_text" property="contentText" />
+        <result column="create_time" property="createTime" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="create_by" property="createBy" />
+        <result column="modify_by" property="modifyBy" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        content_id, news_id, content_text, create_time, modify_time, create_by, modify_by
+    </sql>
+
+    <!--新闻内容-->
+    <select id="findByNewsId" resultMap="BaseResultMap">
+        SELECT nc.* FROM `news_content` nc
+        WHERE nc.`news_id` = #{newsId}
+        order by nc.modify_time desc limit 1
+    </select>
+
+    <!--删除新闻内容-->
+    <delete id="delByNewsId">
+        delete from news_content where `news_id` = #{newsId}
+    </delete>
+
+</mapper>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rzyc.fulongapi.mapper.BuildUnitHouseholderMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.rzyc.fulongapi.model.BuildUnitHouseholder">
+        <id column="householder_id" property="householderId" />
+        <result column="building_unit_id" property="buildingUnitId" />
+        <result column="householder_name" property="householderName" />
+        <result column="householder_phone" property="householderPhone" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        householder_id, building_unit_id, householder_name, householder_phone, create_time
+    </sql>
+
+    <!--单元管理员-->
+    <select id="findByUnitId" resultMap="BaseResultMap">
+        select * from build_unit_householder bh
+        where bh.building_unit_id = #{unitId}
+    </select>
+
+    <!--删除管理员-->
+    <delete id="delByUnitId">
+        delete from build_unit_householder where building_unit_id = #{unitId}
+    </delete>
+
+    <select id="selectByUnitId" resultMap="BaseResultMap">
+         select  householder_id, building_unit_id, householder_name, householder_phone
+         from build_unit_householder bh
+        where bh.building_unit_id = #{unitId}
+        order by create_time asc
+    </select>
+
+</mapper>
