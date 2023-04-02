@@ -142,7 +142,7 @@ public class BigMapController extends BaseController {
     @ApiOperation("分组栋查询所有隐患并且绑定建筑信息")
     public SingleResult selectDangerAndBuilding() throws Exception {
         SingleResult singleResult = new SingleResult();
-        List<Building> buildings = buildingMapper.selectDangerAndBuilding();
+        List<Building> buildings = buildingMapper.selectDangerAndBuilding(DangerTypeEnums.FIRE.getType());
         singleResult.setData(buildings);
         return singleResult;
     }

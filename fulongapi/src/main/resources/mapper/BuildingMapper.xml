@@ -69,12 +69,27 @@
             <result column="unit_number" property="unitNumber" />
             <result column="unit_name" property="unitName" />
             <result column="risk_level" property="riskLevel" />
+            <result column="dangerNum" property="dangerNum" />
         </collection>
     </resultMap>
 
     <select id="selectDangerAndBuilding" resultMap="BuildingAndUnits">
         select build_id, build_name, build_number, build_lat, build_lon,direction,map_unit_hidden_state,
         t3.unit_id,t3.unit_number,t3.unit_name,t3.risk_level
+
+        ,
+        (
+        SELECT COUNT(cd.id)
+        FROM `check_danger` cd
+        LEFT JOIN `danger_type` dt ON cd.danger_type_id = dt.danger_type_id
+        WHERE 1 = 1
+        <if test="null != dangerType">
+            AND dt.type = #{dangerType}
+        </if>
+        AND cd.rectification_state != 3
+        AND cd.building_unit_id = t3.`unit_id`
+        ) dangerNum
+
         from building t1
         left join build_unit t3 on t1.build_id = t3.building_id
         order by t1.direction,t1.build_number,t3.unit_number asc

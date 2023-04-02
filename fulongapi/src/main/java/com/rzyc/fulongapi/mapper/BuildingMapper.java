@@ -26,7 +26,7 @@ public interface BuildingMapper extends BaseMapper<Building> {
 
 
 
-    List<Building> selectDangerAndBuilding();
+    List<Building> selectDangerAndBuilding(@Param("dangerType") Integer dangerType);
 
     Building selectByBuildName(String buildingName);
 
