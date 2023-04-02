@@ -847,13 +847,13 @@ public class BigMapController extends BaseController {
         //隐患总数
         Integer totalNum = 0;
         //已整改隐患
-        Integer rectifyNum = checkDangerMapper.countByType(dangerNumDto.getDangerType(),DangerState.RECTIFYED.getState(),dangerNumDto.getUnitId());
+        Integer rectifyNum = checkDangerMapper.countByType(dangerNumDto.getDangerType(),DangerState.RECTIFYED.getState(),dangerNumDto.getUnitId(),dangerNumDto.getDangerTypeId());
         //不能整改隐患
-        Integer unableRectify = checkDangerMapper.countByType(dangerNumDto.getDangerType(),DangerState.UNABLE_RECTIFY.getState(),dangerNumDto.getUnitId());
+        Integer unableRectify = checkDangerMapper.countByType(dangerNumDto.getDangerType(),DangerState.UNABLE_RECTIFY.getState(),dangerNumDto.getUnitId(),dangerNumDto.getDangerTypeId());
         //整改中
-        Integer rectifyingNum = checkDangerMapper.countByType(dangerNumDto.getDangerType(),DangerState.RECTIFYING.getState(),dangerNumDto.getUnitId());
+        Integer rectifyingNum = checkDangerMapper.countByType(dangerNumDto.getDangerType(),DangerState.RECTIFYING.getState(),dangerNumDto.getUnitId(),dangerNumDto.getDangerTypeId());
         //未整改数
-        Integer notRectifyNum = checkDangerMapper.countByType(dangerNumDto.getDangerType(),DangerState.NOT_RECTIFY.getState(),dangerNumDto.getUnitId());
+        Integer notRectifyNum = checkDangerMapper.countByType(dangerNumDto.getDangerType(),DangerState.NOT_RECTIFY.getState(),dangerNumDto.getUnitId(),dangerNumDto.getDangerTypeId());
         totalNum = rectifyNum + unableRectify + rectifyingNum + notRectifyNum;
 
         dangerData.setTotalNum(totalNum);
@@ -930,5 +930,20 @@ public class BigMapController extends BaseController {
         return result;
     }
 
+    /**
+     * 按照类型查询隐患类型
+     * @version v1.0
+     * @author dong
+     * @date 2023/4/2 16:34
+     */
+    @GetMapping("/getDangerTypes")
+    @ApiImplicitParam(name ="dangetType",value = "隐患类型 1.燃气 3.消防",required = true)
+    @ApiOperation("按照类型查询隐患类型")
+    public MultiResult<DangerType> getDangerTypes(Integer dangetType)throws Exception{
+        MultiResult<DangerType> result = new MultiResult<>();
+        List<DangerType> dangerTypes = dangerTypeMapper.findByType(dangetType);
+        result.setData(dangerTypes);
+        return result;
+    }
 
 }

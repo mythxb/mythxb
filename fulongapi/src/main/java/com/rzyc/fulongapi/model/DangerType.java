@@ -21,9 +21,11 @@ public class DangerType implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    @ApiModelProperty("隐患类型id")
     @TableId
     private String dangerTypeId;
 
+    @ApiModelProperty("隐患类型")
     private String dangerTypeName;
 
     @ApiModelProperty("排序")

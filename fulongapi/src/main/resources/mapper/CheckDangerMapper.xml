@@ -547,6 +547,9 @@
         <if test="null != unitId and '' != unitId">
             and cd.building_unit_id = #{unitId}
         </if>
+        <if test="null != dangerTypeId and '' != dangerTypeId">
+            and cd.danger_type_id = #{dangerTypeId}
+        </if>
 
     </select>
 

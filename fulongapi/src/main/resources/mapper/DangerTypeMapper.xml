@@ -97,4 +97,11 @@
           </if>
     </select>
 
+    <!--按照类型查询隐患类型-->
+    <select id="findByType" resultMap="BaseResultMap">
+        SELECT * FROM `danger_type` dt
+        WHERE dt.`type` = #{type}
+        ORDER BY dt.`sort_id` ASC
+    </select>
+
 </mapper>

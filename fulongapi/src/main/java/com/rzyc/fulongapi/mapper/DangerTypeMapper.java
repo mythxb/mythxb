@@ -32,4 +32,7 @@ public interface DangerTypeMapper extends BaseMapper<DangerType> {
 
     /*单元消防信息*/
     List<DangerType> unitDnagerInfo(@Param("unitId") String unitId,@Param("dangerType") Integer dangerType);
+
+    /*按照类型查询隐患类型*/
+    List<DangerType> findByType(@Param("type") Integer type);
 }

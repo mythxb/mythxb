@@ -141,7 +141,8 @@ public interface CheckDangerMapper extends BaseMapper<CheckDanger> {
     /*通过隐患类型统计隐患数量*/
     Integer countByType(@Param("dangerType") Integer dangerType,
                         @Param("rectificationState") Integer rectificationState,
-                        @Param("unitId") String unitId);
+                        @Param("unitId") String unitId,
+                        @Param("dangerTypeId") String dangerTypeId);
 
 
 

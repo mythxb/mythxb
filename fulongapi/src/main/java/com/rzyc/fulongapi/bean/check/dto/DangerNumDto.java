@@ -9,8 +9,19 @@ public class DangerNumDto {
     @ApiModelProperty("单元id")
     private String unitId;
 
-    @ApiModelProperty("隐患类型 1.燃气 3.消防")
+    @ApiModelProperty("隐患类型分类 1.燃气 3.消防")
     private Integer dangerType;
+
+    @ApiModelProperty("隐患类型id")
+    private String dangerTypeId;
+
+    public String getDangerTypeId() {
+        return dangerTypeId;
+    }
+
+    public void setDangerTypeId(String dangerTypeId) {
+        this.dangerTypeId = dangerTypeId;
+    }
 
     public String getUnitId() {
         return unitId;
