@@ -156,8 +156,8 @@ public class BigMapController extends BaseController {
      */
     @GetMapping("/selectBuildingInfo")
     @ApiOperation("查询楼栋信息")
-    public SingleResult selectBuildingInfo(String buildingId) throws Exception {
-        SingleResult singleResult = new SingleResult();
+    public SingleResult<Building> selectBuildingInfo(String buildingId) throws Exception {
+        SingleResult<Building> singleResult = new SingleResult<>();
         Building building = buildingMapper.selectBuildingInfo(buildingId);
         Integer household = buildFloorMapper.selectHouseHold(buildingId);
         building.setHouseholdSize(household);
@@ -307,15 +307,16 @@ public class BigMapController extends BaseController {
     @PostMapping("/updateUnitHiddenState")
     @ApiOperation("修改大屏单元隐藏状态")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "楼栋ID", value = "buildingId", required = true, dataType = "string"),
-            @ApiImplicitParam(name = "状态", value = "state", required = true, dataType = "int"),
+            @ApiImplicitParam(name = "buildingId", value = "楼栋ID", required = true, dataType = "string"),
+            @ApiImplicitParam(name = "state", value = "1.显示 2.不显示", required = true, dataType = "int"),
+            @ApiImplicitParam(name = "type", value = "1.单元显示 2.消防隐患显示", required = true, dataType = "int"),
     })
-    public SingleResult updateUnitHiddenState(String buildingId, Integer state) throws Exception {
+    public SingleResult updateUnitHiddenState(String buildingId, Integer state,Integer type) throws Exception {
         SingleResult singleResult = new SingleResult();
-        Integer result = buildingMapper.updateUnitHiddenState(buildingId, state);
-        if (result < 1) {
-            singleResult.setMessage(Message.ERROR);
-            singleResult.setCode(Code.ERROR.getCode());
+        if(1 == type){
+            buildingMapper.updateUnitHiddenState(buildingId, state);
+        }else{
+            buildingMapper.updateFireState(buildingId, state);
         }
         return singleResult;
     }
@@ -943,6 +944,13 @@ public class BigMapController extends BaseController {
         MultiResult<DangerType> result = new MultiResult<>();
         List<DangerType> dangerTypes = dangerTypeMapper.findByType(dangetType);
         result.setData(dangerTypes);
+        return result;
+    }
+
+    @GetMapping("/test")
+    @ApiOperation("测试")
+    public MultiResult<String> test()throws Exception{
+        MultiResult<String> result = new MultiResult<>();
         return result;
     }
 

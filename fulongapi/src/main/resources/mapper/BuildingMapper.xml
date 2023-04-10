@@ -64,6 +64,7 @@
         <result column="direction" property="direction"/>
         <result column="unitCount" property="unitCount"/>
         <result column="map_unit_hidden_state" property="mapUnitHiddenState"/>
+        <result column="fire_state" property="fireState"/>
         <collection property="units" column="id" ofType="com.rzyc.fulongapi.model.BuildUnit">
             <id column="unit_id" property="unitId" />
             <result column="unit_number" property="unitNumber" />
@@ -75,6 +76,7 @@
 
     <select id="selectDangerAndBuilding" resultMap="BuildingAndUnits">
         select build_id, build_name, build_number, build_lat, build_lon,direction,map_unit_hidden_state,
+               fire_state,
         t3.unit_id,t3.unit_number,t3.unit_name,t3.risk_level
 
         ,
@@ -96,7 +98,8 @@
     </select>
 
     <select id="selectBuildingInfo" resultType="com.rzyc.fulongapi.model.Building">
-        select build_id, build_name,building_time, build_number, build_lat,map_unit_hidden_state mapUnitHiddenState,
+        select build_id, build_name,building_time, build_number, build_lat,
+               map_unit_hidden_state mapUnitHiddenState,fire_state,
         build_lon,t1.building_manager as buildingManager ,t1.building_manager_contact as buildingManagerContact,
         count(t2.unit_id)as unitCount
          from building t1
@@ -152,6 +155,11 @@
 
     <update id="updateUnitHiddenState">
         update building set map_unit_hidden_state = #{state} where build_id = #{buildingId}
+    </update>
+
+    <!--修改大屏消防隐患标志显示或隐藏-->
+    <update id="updateFireState">
+        update building set fire_state = #{state} where build_id = #{buildingId}
     </update>
 
     <!--楼栋列表-->

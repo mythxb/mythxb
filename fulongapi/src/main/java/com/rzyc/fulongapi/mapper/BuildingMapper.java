@@ -54,6 +54,9 @@ public interface BuildingMapper extends BaseMapper<Building> {
 
     Integer updateUnitHiddenState(@Param("buildingId")String buildingId,@Param("state") Integer state);
 
+    /*修改大屏消防隐患标志显示或隐藏*/
+    Integer updateFireState(@Param("buildingId")String buildingId,@Param("state") Integer state);
+
     /*楼栋列表*/
     List<Building> buildingList(@Param("condition") String condition,
                                 @Param("direction") Integer direction,

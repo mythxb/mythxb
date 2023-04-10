@@ -55,8 +55,12 @@ public class Building implements Serializable {
     @ApiModelProperty("二维码")
     private String qrCode;
 
-    @ApiModelProperty("大屏单元隐藏标志")
+    @ApiModelProperty("大屏单元标志显示或隐藏 1.显示 2.不显示")
     private Integer mapUnitHiddenState;
+
+    @TableField("fire_state")
+    @ApiModelProperty("大屏单元标志显示或隐藏 1.显示 2.不显示")
+    private Integer fireState;
 
     private String createBy;
 
@@ -81,6 +85,14 @@ public class Building implements Serializable {
     //楼栋户数
     @TableField(exist = false)
     private Integer householdSize;
+
+    public Integer getFireState() {
+        return fireState;
+    }
+
+    public void setFireState(Integer fireState) {
+        this.fireState = fireState;
+    }
 
     public Integer getMapUnitHiddenState() {
         return mapUnitHiddenState;
