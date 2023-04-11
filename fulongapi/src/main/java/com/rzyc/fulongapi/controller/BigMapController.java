@@ -867,8 +867,8 @@ public class BigMapController extends BaseController {
         Integer rectifyRate = 0;
         if(totalNum>0){
             Double rate = Arith.div(rectifyNum,totalNum);
+            rate = rate * 100;
             rectifyRate = rate.intValue();
-            rectifyRate = rectifyRate * 100;
         }
         dangerData.setRectifyRate(rectifyRate);
 
