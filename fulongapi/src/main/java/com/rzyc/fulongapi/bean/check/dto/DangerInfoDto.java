@@ -1,6 +1,5 @@
 package com.rzyc.fulongapi.bean.check.dto;
 
-import com.common.utils.model.SingleResult;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
