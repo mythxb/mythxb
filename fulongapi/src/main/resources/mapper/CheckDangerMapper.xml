@@ -553,4 +553,9 @@
 
     </select>
 
+    <!--修改隐患状态-->
+    <update id="changeGasState">
+        UPDATE `check_danger` SET rectification_state = 3 WHERE building_unit_id = #{unitId} and create_time &lt;= '2022-10-22 17:55:22'
+    </update>
+
 </mapper>

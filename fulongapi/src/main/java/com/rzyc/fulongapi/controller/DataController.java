@@ -1829,6 +1829,128 @@ public class DataController extends BaseController {
     }
 
 
+    /**
+     *
+     * @version v1.0
+     * @author dong
+     * @date 2023/4/11 21:09
+     */
+    @ApiOperation(value = "导入燃气隐患", notes = "导入燃气隐患")
+    @RequestMapping(value = "/inportGasDanger", method = RequestMethod.POST)
+    @ResponseBody
+    public SingleResult<String> inportGasDanger(@RequestBody MultipartFile multipartFile) throws Exception {
+        SingleResult<String> result = new SingleResult<>();
+        if (null != multipartFile) {
+            Workbook wookbook = WorkbookFactory.create(multipartFile.getInputStream());
+            Sheet sheet = wookbook.getSheetAt(0);
+
+            //获得表头
+            Row rowHead = sheet.getRow(0);
+
+            System.out.println("getPhysicalNumberOfCells -> " + rowHead.getPhysicalNumberOfCells());
+            //判断表头是否正确
+            if (true) {
+                //获得数据的总行数
+                int totalRowNum = sheet.getLastRowNum();
+
+                if (totalRowNum > 0) {
+
+                    DataFormatter dataFormatter = new DataFormatter();
+
+
+                    Map<String, String> unitNumMap = new HashMap<>();
+                    unitNumMap.put("一", "1");
+                    unitNumMap.put("二", "2");
+                    unitNumMap.put("三", "3");
+                    unitNumMap.put("四", "4");
+                    unitNumMap.put("五", "5");
+                    unitNumMap.put("六", "6");
+                    unitNumMap.put("七", "7");
+                    unitNumMap.put("八", "8");
+                    unitNumMap.put("九", "9");
+                    unitNumMap.put("十", "10");
+                    unitNumMap.put("十一", "11");
+                    unitNumMap.put("十二", "12");
+                    unitNumMap.put("十三", "13");
+                    unitNumMap.put("十四", "14");
+                    unitNumMap.put("十五", "15");
+                    unitNumMap.put("十六", "16");
+                    unitNumMap.put("十七", "17");
+                    unitNumMap.put("十八", "18");
+                    unitNumMap.put("十九", "19");
+                    unitNumMap.put("二十", "20");
+
+
+                    Integer index = 1;
+                    //检查分类
+                    String addressText = "";
+                    //获得所有数据
+                    for (int i = 0; i <= totalRowNum; i++) {
+                        //获得第i行对象
+                        Row row = sheet.getRow(i);
+                        if (null == row) {
+                            break;
+                        }
+
+                        System.out.println("index -> " + index);
+                        index++;
+
+
+                        Cell cell = row.getCell((short) 0);
+                        if (null != cell) {
+                            String addressStr = dataFormatter.formatCellValue(cell);
+                            if (StringUtils.isNotBlank(addressStr)) {
+                                addressText = addressStr;
+                            }
+                        }
+
+                        System.out.println("addressText ---> "+addressText);
+                        //2、东街 1、西街
+                        Integer direction = 2;
+
+                        if(addressText.contains("伏龙西街")){
+                            direction = 1;
+                        }
+
+                        addressText = addressText.replaceAll("伏龙东街1号","");
+                        addressText = addressText.replaceAll("伏龙西街2号","");
+                        addressText = addressText.replaceAll("伏龙西街1号","");
+                        addressText = addressText.replaceAll("单元","");
+                        addressText = addressText.replaceAll("单","");
+                        addressText = addressText.replaceAll("单 ","");
+                        addressText = addressText.replaceAll(" ","");
+                        addressText = addressText.replaceAll("街","");
+                        addressText = addressText.replaceAll("单无","");
+                        addressText = addressText.replaceAll("无","");
+
+                        System.out.println("addressText after ---> "+addressText);
+
+                        String[] strs = addressText.split("栋");
+
+                        if(null != strs && strs.length == 2){
+                            String buildStr = strs[0];
+                            String unitStr = strs[1];
+                            System.out.println(direction + " - " + buildStr + " - " + unitStr);
+
+                            Building building = buildingMapper.findBuilding(direction,TypeConversion.StringToInteger(buildStr));
+                            if(null != building){
+                                BuildUnit buildUnit = buildUnitMapper.findByBuildingId(building.getBuildId(),TypeConversion.StringToInteger(unitStr));
+                                if(null != buildUnit){
+                                    checkDangerMapper.changeGasState(buildUnit.getUnitId());
+                                }
+                            }
+                        }
+
+                    }
+                    System.out.println();
+                }
+            }
+        }
+        return result;
+    }
+
+
+
 
 
 }

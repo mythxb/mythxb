@@ -144,6 +144,9 @@ public interface CheckDangerMapper extends BaseMapper<CheckDanger> {
                         @Param("unitId") String unitId,
                         @Param("dangerTypeId") String dangerTypeId);
 
+    /*修改隐患状态*/
+    Integer changeGasState(@Param("unitId") String unitId);
+
 
 
 
