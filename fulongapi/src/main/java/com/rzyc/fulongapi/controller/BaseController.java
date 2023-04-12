@@ -263,12 +263,12 @@ public class BaseController {
 
         Integer riskLevel = RiskLevel.YELLOW.getLevel();
         if (null != checkDangers && checkDangers.size() > 0) {
-            for (CheckDanger checkDanger : checkDangers) {
-                if (dangerTypeIds.contains(checkDanger.getDangerTypeId())) {
-                    riskLevel = RiskLevel.ORANGE.getLevel();
-                    break;
-                }
-            }
+//            for (CheckDanger checkDanger : checkDangers) {
+//                if (dangerTypeIds.contains(checkDanger.getDangerTypeId())) {
+//                    riskLevel = RiskLevel.ORANGE.getLevel();
+//                    break;
+//                }
+//            }
         } else {
             riskLevel = RiskLevel.BLUE.getLevel();
         }

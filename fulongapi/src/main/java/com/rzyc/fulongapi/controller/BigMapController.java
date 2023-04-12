@@ -668,7 +668,7 @@ public class BigMapController extends BaseController {
         Integer total = 0;
         Integer localNum = 0;
         Integer outTownNum = 0;
-        Integer specialNum = 72;
+        Integer specialNum = 0;
 
         List<BuildingResident> residents = buildingResidentMapper.findAll();
         if(null != residents && residents.size() > 0){
@@ -690,8 +690,8 @@ public class BigMapController extends BaseController {
         }
 
 
-        total = 16280;
-        outTownNum = 11078;
+        total = 16550;
+        outTownNum = 13045;
 
         localNum = total - outTownNum;
 
@@ -867,11 +867,17 @@ public class BigMapController extends BaseController {
         Integer notRectifyNum = checkDangerMapper.countByType(dangerNumDto.getDangerType(),DangerState.NOT_RECTIFY.getState(),dangerNumDto.getUnitId(),dangerNumDto.getDangerTypeId());
         totalNum = rectifyNum + unableRectify + rectifyingNum + notRectifyNum;
 
-        if(3 == dangerNumDto.getDangerType()){
+        if(null != dangerNumDto.getDangerType() && 3 == dangerNumDto.getDangerType() && StringUtils.isBlank(dangerNumDto.getUnitId())){
             totalNum = 3755;
             rectifyNum = 3567;
             unableRectify = 0;
             rectifyingNum = 188;
+            notRectifyNum = 0;
+        }else if(null != dangerNumDto.getDangerType() && 1 == dangerNumDto.getDangerType() && StringUtils.isBlank(dangerNumDto.getUnitId())){
+            totalNum = 7009;
+            rectifyNum = 6519;
+            unableRectify = 0;
+            rectifyingNum = 490;
             notRectifyNum = 0;
         }
 
