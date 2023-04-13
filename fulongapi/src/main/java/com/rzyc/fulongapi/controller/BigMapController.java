@@ -690,7 +690,7 @@ public class BigMapController extends BaseController {
         }
 
 
-        total = 16550;
+        total = 16032;
         outTownNum = 13045;
 
         localNum = total - outTownNum;
