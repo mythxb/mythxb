@@ -13,7 +13,7 @@ spring:
     name: fulong
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://221.237.108.74:8013/hyfulong_test?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8&useSSL=false
+    url: jdbc:mysql://221.237.108.74:8013/hyfulong_platform?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8&useSSL=false
     username: root
     password: rzyc123456
     tomcat:
@@ -43,3 +43,5 @@ onstants:
   file_header: /resource/fulong/uploadFile/
   #文件服务器地址
   service_file_header: http://121.40.106.103/
+  #免密登录账户
+  default_user: authuser

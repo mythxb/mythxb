@@ -109,6 +109,39 @@ public class PersionalController extends BaseController {
         return result;
     }
 
+
+    /**
+     * 免密登录
+     * @version v1.0
+     * @author dong
+     * @date 2023/5/24 20:09
+     */
+    @ApiOperation(value = "免密登录", notes = "免密登录")
+    @PostMapping(value = "/pcUserAuth")
+    @ResponseBody
+    public SingleResult<SysUser> pcUserAuth() throws Exception {
+        SingleResult<SysUser> result = new SingleResult<>();
+
+        String userName = constantsConfigure.getDefaultUser();
+
+        SysUser sysUser = sysUserMapper.getByName(userName);
+
+        if (null != sysUser) {
+
+            sysUser.setUserPassword("");
+
+            //获取用户令牌
+            String userToken = JwtUtil.createToken(sysUser.getUserId());
+            sysUser.setUserToken(userToken);
+
+            result.setData(sysUser);
+        } else {
+            result.setCode(Code.PASSWORD_ERROR.getCode());
+            result.setMessage(Message.PASSWORD_ERROR);
+        }
+        return result;
+    }
+
     @ApiOperation(value = "小程序登录", notes = "小程序登录")
     @PostMapping(value = "/wechatLogin")
     @ResponseBody

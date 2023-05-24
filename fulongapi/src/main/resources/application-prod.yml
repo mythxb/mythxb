@@ -42,3 +42,5 @@ onstants:
   file_header: /resource/fulong/uploadFile/
   #文件服务器地址
   service_file_header: http://121.40.106.103/
+  #免密登录账户
+  default_user: authuser

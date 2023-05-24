@@ -1,5 +1,5 @@
 spring:
   profiles:
-    active: test #设定打包配置文件
+    active: prod #设定打包配置文件
 
 

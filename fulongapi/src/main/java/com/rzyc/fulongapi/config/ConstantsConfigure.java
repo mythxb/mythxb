@@ -21,6 +21,18 @@ public class ConstantsConfigure {
     @Value("${onstants.service_file_header}")
     private String serviceFileHeader;
 
+    //免密登录账户
+    @Value("${onstants.default_user}")
+    private String defaultUser;
+
+    public String getDefaultUser() {
+        return defaultUser;
+    }
+
+    public void setDefaultUser(String defaultUser) {
+        this.defaultUser = defaultUser;
+    }
+
     public String getFileLocation() {
         return fileLocation;
     }
