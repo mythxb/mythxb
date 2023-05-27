@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rzyc.fulongapi.mapper.SersorAlertMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.rzyc.fulongapi.model.SersorAlert">
+        <id column="alert_id" property="alertId" />
+        <result column="sersor_id" property="sersorId" />
+        <result column="alert_time" property="alertTime" />
+        <result column="state" property="state" />
+        <result column="current_val" property="currentVal" />
+        <result column="alert_state" property="alertState" />
+        <result column="create_time" property="createTime" />
+        <result column="create_by" property="createBy" />
+        <result column="modify_by" property="modifyBy" />
+        <result column="modify_time" property="modifyTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        alert_id, sersor_id, alert_time, state, current_val, alert_state, create_time, create_by, modify_by, modify_time
+    </sql>
+
+    <resultMap id="AlertMap" type="com.rzyc.fulongapi.model.SersorAlert">
+        <id column="alert_id" property="alertId" />
+        <result column="sersor_id" property="sersorId" />
+        <result column="alert_time" property="alertTime" />
+        <result column="state" property="state" />
+        <result column="current_val" property="currentVal" />
+        <result column="alert_state" property="alertState" />
+        <result column="create_time" property="createTime" />
+        <result column="create_by" property="createBy" />
+        <result column="modify_by" property="modifyBy" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="address" property="address" />
+        <result column="sersor_type" property="sersorType" />
+    </resultMap>
+
+    <!--传感器报警列表-->
+    <select id="alertList" resultMap="AlertMap">
+        SELECT sa.*,ss.`address`,ss.`sersor_type`
+        FROM `sersor_alert` sa
+            LEFT JOIN `sersor` ss ON sa.`sersor_id` = ss.`sersor_id`
+        ORDER BY sa.`create_time` DESC
+    </select>
+
+</mapper>

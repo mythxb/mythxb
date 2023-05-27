@@ -174,6 +174,18 @@ public class BaseController {
     @Autowired
     protected BuildUnitLevelMapper buildUnitLevelMapper;
 
+    //传感器
+    @Autowired
+    protected SersorMapper sersorMapper;
+
+    //传感器历史数据
+    @Autowired
+    protected SersorHisValMapper sersorHisValMapper;
+
+    //报警信息
+    @Autowired
+    protected SersorAlertMapper sersorAlertMapper;
+
 
     //验证码KEY
     public String GENERATE_CODE_KEY = "VERIFY_FULONG_CODE_RESULT";

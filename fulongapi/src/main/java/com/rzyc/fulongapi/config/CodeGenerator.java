@@ -11,12 +11,9 @@ import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
 import com.baomidou.mybatisplus.generator.engine.FreemarkerTemplateEngine;
 import com.common.utils.StringUtils;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-
-import static com.common.utils.jasypt.JasyptUtils.decyptPwd;
 
 /**
  * @ClassName MybatisPlus逆向生成工具
@@ -26,6 +23,24 @@ import static com.common.utils.jasypt.JasyptUtils.decyptPwd;
  * @Version 1.0
  **/
 public class CodeGenerator {
+
+    //java路径
+    public static String jarStr = "/fulongapi/src/main/java";
+    //mapper路径
+    public static String mapperStr = "/fulongapi/src/main/resources/mapper/";
+    //根目录报名
+    public static String packgerParent = "com.rzyc.fulongapi";
+
+    //mysql相关信息
+    public static String url = "jdbc:mysql://221.237.108.74:8013/hyfulong_platform?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8&useSSL=false";
+    public static String DriverName = "com.mysql.cj.jdbc.Driver";
+    public static String Username = "root";
+    public static String Password = "rzyc123456";
+
+
+
+
+
     /**
      *
      * 读取控制台内容
@@ -44,6 +59,8 @@ public class CodeGenerator {
         }
         throw new MybatisPlusException("请输入正确的" + tip + "！");
     }
+
+
     public static void main(String[] args) {
         // 实例化代码生成器
         AutoGenerator mpg = new AutoGenerator();
@@ -52,7 +69,7 @@ public class CodeGenerator {
         GlobalConfig gc = new GlobalConfig();
         //当前程序根目录
         final String projectPath = System.getProperty("user.dir");
-        gc.setOutputDir(projectPath + "/fulongapi/src/main/java");
+        gc.setOutputDir(projectPath + jarStr);
         gc.setAuthor("");
         //设置时间类型
         gc.setDateType(DateType.ONLY_DATE);
@@ -67,11 +84,11 @@ public class CodeGenerator {
 
         // 数据源配置
         DataSourceConfig dsc = new DataSourceConfig();
-        dsc.setUrl("jdbc:mysql://121.40.106.103:3306/hyfulong_platform?useSSL=false");
+        dsc.setUrl(url);
         // dsc.setSchemaName("public");
-        dsc.setDriverName("com.mysql.cj.jdbc.Driver");
-        dsc.setUsername("rzyc");
-        dsc.setPassword("admin@rzyc2022.com##");
+        dsc.setDriverName(DriverName);
+        dsc.setUsername(Username);
+        dsc.setPassword(Password);
         mpg.setDataSource(dsc);
 
         // 包配置（生成的entity、controller、service等包名）
@@ -81,7 +98,7 @@ public class CodeGenerator {
         pc.setService("");
         pc.setServiceImpl("");
         // pc.setModuleName(scanner("模块名"));
-        pc.setParent("com.rzyc.fulongapi");
+        pc.setParent(packgerParent);
         mpg.setPackageInfo(pc);
 
         //自定义配置
@@ -102,7 +119,7 @@ public class CodeGenerator {
         focList.add(new FileOutConfig(templatePath) {
             @Override
             public String outputFile(TableInfo tableInfo) {
-                return projectPath+"/fulongapi/src/main/resources/mapper/"+tableInfo.getEntityName()+"Mapper"+StringPool.DOT_XML;
+                return projectPath+mapperStr+tableInfo.getEntityName()+"Mapper"+StringPool.DOT_XML;
             }
         });
         cfg.setFileOutConfigList(focList);
@@ -127,17 +144,23 @@ public class CodeGenerator {
         //【实体】是否为lombok模型（默认 false）
         strategy.setEntityLombokModel(false);
         //生成 @RestController 控制器
-        strategy.setRestControllerStyle(false);
+        strategy.setRestControllerStyle(true);
 
         // strategy.setSuperControllerClass("你自己的父类控制器,没有就不用设置!");
         // 写于父类中的公共字段
-        // strategy.setSuperEntityColumns("id");
+//         strategy.setSuperEntityColumns("id");
         strategy.setInclude(scanner("表名，多个英文逗号分割").split(","));
         strategy.setControllerMappingHyphenStyle(true);
+
+        //生成字段注解
         strategy.setEntityTableFieldAnnotationEnable(true);
+
+
         //strategy.setTablePrefix(pc.getModuleName() + "_");
         mpg.setStrategy(strategy);
         mpg.setTemplateEngine(new FreemarkerTemplateEngine());
         mpg.execute();
     }
+
+
 }
