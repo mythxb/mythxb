@@ -56,7 +56,7 @@ public class LogAspect {
                 .getRequestAttributes()).getRequest();
         System.out.println("");
         System.out.println("uri -> "+request.getRequestURI());
-        System.out.println("ip -> "+request.getRemoteAddr());
+        System.out.println("ip -> "+getIpAddr(request));
 
         //获取参数字符串
         String requestStr = "";
@@ -168,6 +168,49 @@ public class LogAspect {
          */
         public void saveLogs(Log logs)throws Exception{
             logMapper.insert(logs);
+        }
+
+    }
+
+
+
+    /**
+     * 获取ip地址
+     * @author: hanguodong
+     * @date: 2023/6/6 21:57
+     * @param: [request]
+     * @return:
+     **/
+    public String getIpAddr(HttpServletRequest request) {
+
+        String ip = request.getHeader("X-Real-IP");
+
+        if (ip != null && !"".equals(ip) && !"unknown".equalsIgnoreCase(ip)) {
+
+            return ip;
+
+        }
+
+        ip = request.getHeader("X-Forwarded-For");
+
+        if (ip != null && !"".equals(ip) && !"unknown".equalsIgnoreCase(ip)) {
+
+            int index = ip.indexOf(',');
+
+            if (index != -1) {
+
+                return ip.substring(0, index);
+
+            } else {
+
+                return ip;
+
+            }
+
+        } else {
+
+            return request.getRemoteAddr();
+
         }
 
     }

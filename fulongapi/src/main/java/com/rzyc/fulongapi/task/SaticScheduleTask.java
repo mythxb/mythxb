@@ -37,7 +37,7 @@ public class SaticScheduleTask {
      * @author dong
      * @date 2023/5/27 14:06
      */
-    @Scheduled(fixedRate=10000)
+//    @Scheduled(fixedRate=10000)
     private void sendSersonData(){
         try {
             System.out.println("----------------定时任务sendSersonDatastart----------------");

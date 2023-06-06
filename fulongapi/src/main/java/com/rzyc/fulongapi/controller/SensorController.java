@@ -1,10 +1,12 @@
 package com.rzyc.fulongapi.controller;
 
+import com.alibaba.fastjson.JSONArray;
 import com.common.utils.RandomNumber;
 import com.common.utils.TypeConversion;
 import com.common.utils.jwt.JwtUtil;
 import com.common.utils.model.MultiResult;
 import com.common.utils.model.SingleResult;
+import com.rzyc.fulongapi.bean.sensor.SensorDataDto;
 import com.rzyc.fulongapi.mapper.SersorAlertMapper;
 import com.rzyc.fulongapi.model.Sersor;
 import com.rzyc.fulongapi.model.SersorAlert;
@@ -39,21 +41,6 @@ public class SensorController extends BaseController{
     @Autowired
     protected SersorAlertMapper sersorAlertMapper;
 
-
-    /**
-     * 传感器数据推送
-     * @version v1.0
-     * @author dong
-     * @date 2023/5/27 13:36
-     */
-    @ApiOperation(value = "传感器数据推送", notes = "传感器数据推送")
-    @PostMapping(value = "/sensorData")
-    public SingleResult<String> sensorData()throws Exception{
-        SingleResult<String> result = new SingleResult<>();
-        changeSersonData();
-        sersorService.sendData();
-        return result;
-    }
 
     /**
      * 模拟水压
@@ -141,6 +128,23 @@ public class SensorController extends BaseController{
         MultiResult<SersorAlert> result = new MultiResult<>();
         List<SersorAlert> sersorAlerts = sersorAlertMapper.alertList();
         result.setData(sersorAlerts);
+        return result;
+    }
+
+
+    @ApiOperation(value = "传感器数据接收", notes = "传感器数据接收")
+    @PostMapping("/sensorData")
+    public Map<String,String> sensorData(@RequestBody SensorDataDto sensorDataDto){
+        Map<String,String> result = new HashMap<>();
+        try {
+            System.out.println("sensorDataDto ---> "+ JSONArray.toJSONString(sensorDataDto));
+
+//            changeSersonData();
+//            sersorService.sendData();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        result.put("code","ok");
         return result;
     }
 
