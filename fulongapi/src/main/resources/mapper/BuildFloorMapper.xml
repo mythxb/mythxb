@@ -111,7 +111,8 @@
     <select id="findFloorByUnitIdAndFloorNumber" resultMap="BaseResultMap">
         select floor_id, building_id, unit_id, unit_number, floor_number,risk_level,
         person_num,cooker_num,usertable_num,heater_num,
-        household_size from build_floor where unit_id = #{unitId} and floor_number = #{floorNumber}
+        household_size
+        from build_floor where unit_id = #{unitId} and floor_number = #{floorNumber}
     </select>
 
     <select id="getFloorIdByBuildingIdAndUnitIdAndFloor" resultType="java.lang.String">

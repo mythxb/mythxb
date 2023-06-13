@@ -1616,6 +1616,141 @@ public class DataController extends BaseController {
         return result;
     }
 
+    @ApiOperation(value = "导出企业二维码", notes = "导出企业二维码")
+    @RequestMapping(value = "/downQrcode", method = RequestMethod.POST)
+    @ResponseBody
+    public SingleResult<String> downQrcode()throws Exception{
+        SingleResult<String> result = new SingleResult<>();
+        List<Enterprise> enterprises = enterpriseMapper.findAll();
+        for (Enterprise enterprise : enterprises){
+            String imgUrl = "http://121.40.106.103/"+enterprise.getQrCode();
+            String fileName = enterprise.getEntName()+"--"+enterprise.getAddress()+".png";
+            ImageFromNetWork.writeImageToDisk(ImageFromNetWork.getImageFromNetByUrl(imgUrl),"C:/mnt/resource/fulong/qrcode/"+fileName);
+        }
+        return result;
+    }
+
+
+    /**
+     *
+     * @version v1.0
+     * @author dong
+     * @date 2023/4/11 21:09
+     */
+    @ApiOperation(value = "导入燃气隐患", notes = "导入燃气隐患")
+    @RequestMapping(value = "/inportGasDanger", method = RequestMethod.POST)
+    @ResponseBody
+    public SingleResult<String> inportGasDanger(@RequestBody MultipartFile multipartFile) throws Exception {
+        SingleResult<String> result = new SingleResult<>();
+        if (null != multipartFile) {
+            Workbook wookbook = WorkbookFactory.create(multipartFile.getInputStream());
+            Sheet sheet = wookbook.getSheetAt(0);
+
+            //获得表头
+            Row rowHead = sheet.getRow(0);
+
+            System.out.println("getPhysicalNumberOfCells -> " + rowHead.getPhysicalNumberOfCells());
+            //判断表头是否正确
+            if (true) {
+                //获得数据的总行数
+                int totalRowNum = sheet.getLastRowNum();
+
+                if (totalRowNum > 0) {
+
+                    DataFormatter dataFormatter = new DataFormatter();
+
+
+                    Map<String, String> unitNumMap = new HashMap<>();
+                    unitNumMap.put("一", "1");
+                    unitNumMap.put("二", "2");
+                    unitNumMap.put("三", "3");
+                    unitNumMap.put("四", "4");
+                    unitNumMap.put("五", "5");
+                    unitNumMap.put("六", "6");
+                    unitNumMap.put("七", "7");
+                    unitNumMap.put("八", "8");
+                    unitNumMap.put("九", "9");
+                    unitNumMap.put("十", "10");
+                    unitNumMap.put("十一", "11");
+                    unitNumMap.put("十二", "12");
+                    unitNumMap.put("十三", "13");
+                    unitNumMap.put("十四", "14");
+                    unitNumMap.put("十五", "15");
+                    unitNumMap.put("十六", "16");
+                    unitNumMap.put("十七", "17");
+                    unitNumMap.put("十八", "18");
+                    unitNumMap.put("十九", "19");
+                    unitNumMap.put("二十", "20");
+
+
+                    Integer index = 1;
+                    //检查分类
+                    String addressText = "";
+                    //获得所有数据
+                    for (int i = 0; i <= totalRowNum; i++) {
+                        //获得第i行对象
+                        Row row = sheet.getRow(i);
+                        if (null == row) {
+                            break;
+                        }
+
+                        System.out.println("index -> " + index);
+                        index++;
+
+
+                        Cell cell = row.getCell((short) 0);
+                        if (null != cell) {
+                            String addressStr = dataFormatter.formatCellValue(cell);
+                            if (StringUtils.isNotBlank(addressStr)) {
+                                addressText = addressStr;
+                            }
+                        }
+
+                        System.out.println("addressText ---> "+addressText);
+                        //2、东街 1、西街
+                        Integer direction = 2;
+
+                        if(addressText.contains("伏龙西街")){
+                            direction = 1;
+                        }
+
+                        addressText = addressText.replaceAll("伏龙东街1号","");
+                        addressText = addressText.replaceAll("伏龙西街2号","");
+                        addressText = addressText.replaceAll("伏龙西街1号","");
+                        addressText = addressText.replaceAll("单元","");
+                        addressText = addressText.replaceAll("单","");
+                        addressText = addressText.replaceAll("单 ","");
+                        addressText = addressText.replaceAll(" ","");
+                        addressText = addressText.replaceAll("街","");
+                        addressText = addressText.replaceAll("单无","");
+                        addressText = addressText.replaceAll("无","");
+
+                        System.out.println("addressText after ---> "+addressText);
+
+                        String[] strs = addressText.split("栋");
+
+                        if(null != strs && strs.length == 2){
+                            String buildStr = strs[0];
+                            String unitStr = strs[1];
+                            System.out.println(direction + " - " + buildStr + " - " + unitStr);
+
+                            Building building = buildingMapper.findBuilding(direction,TypeConversion.StringToInteger(buildStr));
+                            if(null != building){
+                                BuildUnit buildUnit = buildUnitMapper.findByBuildingId(building.getBuildId(),TypeConversion.StringToInteger(unitStr));
+                                if(null != buildUnit){
+                                    checkDangerMapper.changeGasState(buildUnit.getUnitId());
+                                }
+                            }
+                        }
+
+                    }
+                    System.out.println();
+                }
+            }
+        }
+        return result;
+    }
+
 
     @ApiOperation(value = "导入企业信息", notes = "导入企业信息")
     @RequestMapping(value = "/importEntInfo", method = RequestMethod.POST)
@@ -1814,31 +1949,17 @@ public class DataController extends BaseController {
         return result;
     }
 
-    @ApiOperation(value = "导出企业二维码", notes = "导出企业二维码")
-    @RequestMapping(value = "/downQrcode", method = RequestMethod.POST)
-    @ResponseBody
-    public SingleResult<String> downQrcode()throws Exception{
-        SingleResult<String> result = new SingleResult<>();
-        List<Enterprise> enterprises = enterpriseMapper.findAll();
-        for (Enterprise enterprise : enterprises){
-            String imgUrl = "http://121.40.106.103/"+enterprise.getQrCode();
-            String fileName = enterprise.getEntName()+"--"+enterprise.getAddress()+".png";
-            ImageFromNetWork.writeImageToDisk(ImageFromNetWork.getImageFromNetByUrl(imgUrl),"C:/mnt/resource/fulong/qrcode/"+fileName);
-        }
-        return result;
-    }
-
 
     /**
-     *
+     *导入人员
      * @version v1.0
      * @author dong
      * @date 2023/4/11 21:09
      */
-    @ApiOperation(value = "导入燃气隐患", notes = "导入燃气隐患")
-    @RequestMapping(value = "/inportGasDanger", method = RequestMethod.POST)
+    @ApiOperation(value = "导入人员", notes = "导入人员")
+    @RequestMapping(value = "/importPerson", method = RequestMethod.POST)
     @ResponseBody
-    public SingleResult<String> inportGasDanger(@RequestBody MultipartFile multipartFile) throws Exception {
+    public SingleResult<String> importPerson(@RequestBody MultipartFile multipartFile) throws Exception {
         SingleResult<String> result = new SingleResult<>();
         if (null != multipartFile) {
             Workbook wookbook = WorkbookFactory.create(multipartFile.getInputStream());
@@ -1858,34 +1979,20 @@ public class DataController extends BaseController {
                     DataFormatter dataFormatter = new DataFormatter();
 
 
-                    Map<String, String> unitNumMap = new HashMap<>();
-                    unitNumMap.put("一", "1");
-                    unitNumMap.put("二", "2");
-                    unitNumMap.put("三", "3");
-                    unitNumMap.put("四", "4");
-                    unitNumMap.put("五", "5");
-                    unitNumMap.put("六", "6");
-                    unitNumMap.put("七", "7");
-                    unitNumMap.put("八", "8");
-                    unitNumMap.put("九", "9");
-                    unitNumMap.put("十", "10");
-                    unitNumMap.put("十一", "11");
-                    unitNumMap.put("十二", "12");
-                    unitNumMap.put("十三", "13");
-                    unitNumMap.put("十四", "14");
-                    unitNumMap.put("十五", "15");
-                    unitNumMap.put("十六", "16");
-                    unitNumMap.put("十七", "17");
-                    unitNumMap.put("十八", "18");
-                    unitNumMap.put("十九", "19");
-                    unitNumMap.put("二十", "20");
-
 
                     Integer index = 1;
-                    //检查分类
-                    String addressText = "";
+
                     //获得所有数据
-                    for (int i = 0; i <= totalRowNum; i++) {
+                    for (int i = 1; i <= totalRowNum; i++) {
+
+                        String residentName = "";
+                        String residentIdentityCard = "";
+                        String floorId = "";
+                        String unitId = "";
+                        Integer status = 1;
+                        Integer residentType = 2;
+                        String addressText = "";
+
                         //获得第i行对象
                         Row row = sheet.getRow(i);
                         if (null == row) {
@@ -1896,15 +2003,21 @@ public class DataController extends BaseController {
                         index++;
 
 
-                        Cell cell = row.getCell((short) 0);
+                        Cell cell = row.getCell((short) 1);
                         if (null != cell) {
-                            String addressStr = dataFormatter.formatCellValue(cell);
-                            if (StringUtils.isNotBlank(addressStr)) {
-                                addressText = addressStr;
-                            }
+                            residentIdentityCard = dataFormatter.formatCellValue(cell);
                         }
 
-                        System.out.println("addressText ---> "+addressText);
+                        cell = row.getCell((short) 2);
+                        if (null != cell) {
+                            residentName = dataFormatter.formatCellValue(cell);
+                        }
+
+                        cell = row.getCell((short) 8);
+                        if (null != cell) {
+                            addressText = dataFormatter.formatCellValue(cell);
+                        }
+
                         //2、东街 1、西街
                         Integer direction = 2;
 
@@ -1912,43 +2025,74 @@ public class DataController extends BaseController {
                             direction = 1;
                         }
 
-                        addressText = addressText.replaceAll("伏龙东街1号","");
-                        addressText = addressText.replaceAll("伏龙西街2号","");
-                        addressText = addressText.replaceAll("伏龙西街1号","");
-                        addressText = addressText.replaceAll("单元","");
-                        addressText = addressText.replaceAll("单","");
-                        addressText = addressText.replaceAll("单 ","");
-                        addressText = addressText.replaceAll(" ","");
-                        addressText = addressText.replaceAll("街","");
-                        addressText = addressText.replaceAll("单无","");
-                        addressText = addressText.replaceAll("无","");
+                        addressText = addressText.replace("四川省成都市天府新区","");
 
-                        System.out.println("addressText after ---> "+addressText);
+                        String[] strs = addressText.split("号");
+                        addressText = strs[1];
 
-                        String[] strs = addressText.split("栋");
+                        String[] builds = addressText.split("栋");
+                        String[] units = builds[1].split("单元");
+                        String[] floors = units[1].split("楼");
 
-                        if(null != strs && strs.length == 2){
-                            String buildStr = strs[0];
-                            String unitStr = strs[1];
-                            System.out.println(direction + " - " + buildStr + " - " + unitStr);
+                        String buildNum = builds[0];
+                        String unitNum = units[0];
+                        String floorNum = floors[0];
 
-                            Building building = buildingMapper.findBuilding(direction,TypeConversion.StringToInteger(buildStr));
-                            if(null != building){
-                                BuildUnit buildUnit = buildUnitMapper.findByBuildingId(building.getBuildId(),TypeConversion.StringToInteger(unitStr));
-                                if(null != buildUnit){
-                                    checkDangerMapper.changeGasState(buildUnit.getUnitId());
+                        System.out.println("residentName ---> "+residentName);
+                        System.out.println("residentIdentityCard ---> "+residentIdentityCard);
+                        System.out.println("addressText ---> "+addressText);
+                        System.out.println("direction ---> "+direction);
+                        System.out.println("楼栋 ---> "+buildNum);
+                        System.out.println("单元 ---> "+unitNum);
+                        System.out.println("楼 ---> "+floorNum);
+
+                        Building building = buildingMapper.findBuilding(direction,TypeConversion.StringToInteger(buildNum));
+                        if(null != building){
+                            BuildUnit buildUnit = buildUnitMapper.findByBuildingId(building.getBuildId(),TypeConversion.StringToInteger(unitNum));
+                            if(null != buildUnit){
+                                BuildFloor floor = buildFloorMapper.findFloorByUnitIdAndFloorNumber(buildUnit.getUnitId(),TypeConversion.StringToInteger(floorNum));
+                                if(null != floor){
+                                    String idCard = AesEncryptUtil.encrypt(residentIdentityCard);
+
+                                    BuildingResident buildingResident = buildingResidentMapper.findByIdCard(idCard);
+                                    if(null == buildingResident){
+                                        buildingResident = new BuildingResident();
+                                        buildingResident.setResidentId(RandomNumber.getUUid());
+                                        buildingResident.setResidentName(residentName);
+                                        buildingResident.setResidentIdentityCard(idCard);
+                                        buildingResident.setResidentType(residentType);
+                                        buildingResident.setStatus(status);
+                                        buildingResident.setBuildingId(building.getBuildId());
+                                        buildingResident.setBuildingUnitId(buildUnit.getUnitId());
+                                        buildingResident.setFloorId(floor.getFloorId());
+                                        buildingResident.setCreateBy("excel");
+                                        buildingResident.setCreateTime(new Date());
+                                        buildingResident.setModifyBy("excel");
+                                        buildingResident.setModifyTime(new Date());
+                                        buildingResidentMapper.insert(buildingResident);
+                                    }
                                 }
                             }
                         }
-
+                        System.out.println();
                     }
-                    System.out.println();
+
                 }
             }
         }
         return result;
     }
 
+    public static void main(String[] args) {
+        try {
+            String str = "伏龙西街2号9栋9单元3楼3号";
+            String[] strs = str.split("号");
+            System.out.println(strs[1]);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
 
 
 

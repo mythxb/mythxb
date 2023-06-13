@@ -146,6 +146,12 @@
         SELECT * FROM `building_resident`
     </select>
 
+    <!--通过身份证号搜索-->
+    <select id="findByIdCard" resultMap="BaseResultMap">
+        SELECT * FROM `building_resident` br where br.resident_identity_card = #{idCard}
+        limit 1
+    </select>
+
     <!--人口类型信息-->
     <resultMap id="PopulationTypeResultMap" type="com.rzyc.fulongapi.bean.user.PopulationType">
         <result column="selfUseNum" property="selfUseNum" />

@@ -51,6 +51,9 @@ public interface BuildingResidentMapper extends BaseMapper<BuildingResident> {
     /*所有数据*/
     List<BuildingResident> findAll();
 
+    /*通过身份证号搜索*/
+    BuildingResident findByIdCard(@Param("idCard") String idCard);
+
     /*人口类型分布信息*/
     PopulationType populationTypeV1();
 
