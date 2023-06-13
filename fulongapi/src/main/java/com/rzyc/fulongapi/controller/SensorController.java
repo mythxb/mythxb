@@ -1,18 +1,23 @@
 package com.rzyc.fulongapi.controller;
 
 import com.alibaba.fastjson.JSONArray;
+import com.common.utils.DateUtils;
 import com.common.utils.RandomNumber;
+import com.common.utils.StringUtils;
 import com.common.utils.TypeConversion;
 import com.common.utils.jwt.JwtUtil;
 import com.common.utils.model.MultiResult;
 import com.common.utils.model.SingleResult;
 import com.rzyc.fulongapi.bean.sensor.SensorDataDto;
 import com.rzyc.fulongapi.mapper.SersorAlertMapper;
+import com.rzyc.fulongapi.model.SensorWt;
+import com.rzyc.fulongapi.model.SensorWtHis;
 import com.rzyc.fulongapi.model.Sersor;
 import com.rzyc.fulongapi.model.SersorAlert;
 import com.rzyc.fulongapi.service.SersorService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
@@ -139,13 +144,66 @@ public class SensorController extends BaseController{
         try {
             System.out.println("sensorDataDto ---> "+ JSONArray.toJSONString(sensorDataDto));
 
-//            changeSersonData();
-//            sersorService.sendData();
+
+            SensorWt sensorWt = new SensorWt();
+            BeanUtils.copyProperties(sensorWt,sensorDataDto);
+
+            if(StringUtils.isNotBlank(sensorDataDto.getCreatetime())){
+                sensorWt.setCreatetime(DateUtils.timet(Long.valueOf(sensorDataDto.getCreatetime()),"yyyy-MM-dd HH:mm:ss"));
+            }
+            if(StringUtils.isNotBlank(sensorDataDto.getCollectiontime())){
+                sensorWt.setCollectiontime(DateUtils.timet(Long.valueOf(sensorDataDto.getCollectiontime()),"yyyy-MM-dd HH:mm:ss"));
+            }
+
+
+
+            //实时数据记录
+            SensorWt wt = sensorWtMapper.findBySmokeid(sensorWt.getSmokeid());
+            if(null != wt){
+                sensorWt.setSersorId(wt.getSersorId());
+                sensorWt.setModifyTime(new Date());
+                sensorWtMapper.updateById(sensorWt);
+            }else{
+                sensorWt.setSersorId(RandomNumber.getUUid());
+                sensorWt.setModifyTime(new Date());
+                sensorWtMapper.insert(sensorWt);
+            }
+
+
+
+
+            //历史数据
+            SensorWtHis sensorWtHis = new SensorWtHis();
+            BeanUtils.copyProperties(sensorWtHis,sensorDataDto);
+            sensorWtHis.setSersorId(RandomNumber.getUUid());
+
+
+            if(StringUtils.isNotBlank(sensorDataDto.getCreatetime())){
+                sensorWtHis.setCreatetime(DateUtils.timet(Long.valueOf(sensorDataDto.getCreatetime()),"yyyy-MM-dd HH:mm:ss"));
+            }
+            if(StringUtils.isNotBlank(sensorDataDto.getCollectiontime())){
+                sensorWtHis.setCollectiontime(DateUtils.timet(Long.valueOf(sensorDataDto.getCollectiontime()),"yyyy-MM-dd HH:mm:ss"));
+            }
+
+
+
+            sensorWtHis.setModifyTime(new Date());
+            sensorWtHisMapper.insert(sensorWtHis);
+
+            sersorService.sendData();
         }catch (Exception e){
             e.printStackTrace();
         }
         result.put("code","ok");
         return result;
+    }
+
+    public static void main(String[] args) {
+        try {
+            System.out.println(DateUtils.timet(1686554179471l,"yyyy-MM-dd HH:mm:ss"));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
 

@@ -1,14 +1,14 @@
 package com.rzyc.fulongapi.service;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.common.utils.TypeConversion;
 import com.common.utils.model.Pager;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.rzyc.fulongapi.bean.check.ChecksList;
+import com.rzyc.fulongapi.mapper.SensorWtMapper;
 import com.rzyc.fulongapi.mapper.SersorHisValMapper;
 import com.rzyc.fulongapi.mapper.SersorMapper;
+import com.rzyc.fulongapi.model.SensorWt;
 import com.rzyc.fulongapi.model.Sersor;
 import com.rzyc.fulongapi.websocket.SersorWs;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +35,10 @@ public class SersorService {
     @Autowired
     protected SersorHisValMapper sersorHisValMapper;
 
+    //水压传感器
+    @Autowired
+    protected SensorWtMapper sensorWtMapper;
+
     /**
      * 发送数据
      * @version v1.0
@@ -53,7 +57,7 @@ public class SersorService {
 
         Pager<Sersor> pager = new Pager<>();
         PageHelper.startPage(TypeConversion.StringToInteger(pageStr), 10);
-        Page<Sersor> pages = (Page<Sersor>) sersorMapper.findByType(TypeConversion.StringToInteger(sensorTypeStr));
+        Page<SensorWt> pages = (Page<SensorWt>) sensorWtMapper.findAll();
         getDatePage(pager,pages);
         mapData.put("dataType",sensorTypeStr);
         mapData.put("data",pager);
@@ -89,6 +93,27 @@ public class SersorService {
         pager.setPage(page.getPages());
         pager.setPageSize(page.getPageSize());
         pager.setRows(page.getResult());
+    }
+
+
+    /**
+     * 发送数据
+     * @version v1.0
+     * @author dong
+     * @date 2023/5/27 12:14
+     */
+    public void sendSersor(String userId,String smokeid){
+
+        try {
+            SensorWt sensorWt = sensorWtMapper.findBySmokeid(smokeid);
+            if(null != sensorWt){
+                SersorWs.sendMessage(JSONArray.toJSONString(sensorWt));
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+
     }
 
 }

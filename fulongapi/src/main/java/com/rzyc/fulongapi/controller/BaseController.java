@@ -186,6 +186,14 @@ public class BaseController {
     @Autowired
     protected SersorAlertMapper sersorAlertMapper;
 
+    //水压传感器
+    @Autowired
+    protected SensorWtMapper sensorWtMapper;
+
+    //水压传感器历史数据
+    @Autowired
+    protected SensorWtHisMapper sensorWtHisMapper;
+
 
     //验证码KEY
     public String GENERATE_CODE_KEY = "VERIFY_FULONG_CODE_RESULT";

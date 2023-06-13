@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rzyc.fulongapi.mapper.SensorWtMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.rzyc.fulongapi.model.SensorWt">
+        <id column="sersor_id" property="sersorId" />
+        <result column="hxmonitorid" property="hxmonitorid" />
+        <result column="smokeid" property="smokeid" />
+        <result column="mac" property="mac" />
+        <result column="voltagevalue" property="voltagevalue" />
+        <result column="type" property="type" />
+        <result column="codetype" property="codetype" />
+        <result column="code" property="code" />
+        <result column="monitorname" property="monitorname" />
+        <result column="data" property="data" />
+        <result column="dataunit" property="dataunit" />
+        <result column="createtime" property="createtime" />
+        <result column="tvalue" property="tvalue" />
+        <result column="wpstatus" property="wpstatus" />
+        <result column="wrstatus" property="wrstatus" />
+        <result column="wdstatus" property="wdstatus" />
+        <result column="wkstatus" property="wkstatus" />
+        <result column="wostatus" property="wostatus" />
+        <result column="wbstatus" property="wbstatus" />
+        <result column="dsignal" property="dsignal" />
+        <result column="singleflow" property="singleflow" />
+        <result column="totalflow" property="totalflow" />
+        <result column="collectiontime" property="collectiontime" />
+        <result column="batterys" property="batterys" />
+        <result column="businesstype" property="businesstype" />
+        <result column="create_by" property="createBy" />
+        <result column="modify_by" property="modifyBy" />
+        <result column="modify_time" property="modifyTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        sersor_id, hxmonitorid, smokeid, mac, voltagevalue, type, codetype, code, monitorname, data, dataunit, createtime, tvalue, wpstatus, wrstatus, wdstatus, wkstatus, wostatus, wbstatus, dsignal, singleflow, totalflow, collectiontime, batterys, businesstype, create_by, modify_by, modify_time
+    </sql>
+
+    <!--通过设备id查询-->
+    <select id="findBySmokeid" resultMap="BaseResultMap">
+        SELECT * FROM `sensor_wt` sw WHERE sw.smokeid = #{smokeid}
+    </select>
+
+    <!--查询所有-->
+    <select id="findAll" resultMap="BaseResultMap">
+        SELECT * FROM `sensor_wt` s
+    </select>
+
+</mapper>

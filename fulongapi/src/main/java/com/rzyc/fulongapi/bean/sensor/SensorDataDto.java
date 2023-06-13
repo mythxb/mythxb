@@ -9,116 +9,93 @@ import io.swagger.annotations.ApiModelProperty;
  */
 public class SensorDataDto {
 
-    @ApiModelProperty("消息ID")
-    private Long xdsmokelogid;
 
-    @ApiModelProperty("设备ID")
-    private Long smokeid;
+    //
+    private String hxmonitorid;
 
-    @ApiModelProperty("事件类型")
-    private Integer messagetype;
+    //设备ID
+    private String smokeid;
 
-    @ApiModelProperty("设备类型")
-    private String devicetype;
-
-    @ApiModelProperty("设备号唯一编码")
+    //mac地址
     private String mac;
 
-    @ApiModelProperty("设备卡号ICCID")
-    private String ccid;
+    //电压具体值 电压值mV
+    private String voltagevalue;
 
-    @ApiModelProperty("设备卡IMSI")
-    private String imsi;
+    //
+    private String type;
 
-    @ApiModelProperty("信号强度")
-    private Integer dsignal;
+    //
+    private String codetype;
 
-    @ApiModelProperty("电池是否低压 1 表是正常，0 表示低压")
-    private Integer batterys;
+    //
+    private String code;
 
-    @ApiModelProperty("电压具体值 电压值mV")
-    private Integer voltagevalue;
+    //传感器名
+    private String monitorname;
 
-    @ApiModelProperty("监测温度，单位°C")
-    private Integer tvalue;
+    //传感器值
+    private String data;
 
-    @ApiModelProperty("设备IMEI号")
-    private String Imei;
-
-    @ApiModelProperty("防区号")
-    private String ccc;
-
-    @ApiModelProperty("防拆状态     0 闭合 1打开")
-    private Integer tamperstatus;
-
-    @ApiModelProperty("精确到毫秒")
-    private Long createtime;
-
-    @ApiModelProperty("保留")
-    private Integer cstatus;
-
-
-
-    @ApiModelProperty("监控数据")
-    private String monitordata;
-
-    @ApiModelProperty("监控数据单位")
+    //传感器单位
     private String dataunit;
 
-    @ApiModelProperty("水压/水位状态0：水压正常   1:欠压警告    2:过压警告")
-    private Integer wpstatus;
+    //创建时间
+    private String createtime;
 
-    @ApiModelProperty("变化率状态  0：正常状态  1：设备状态报警")
-    private Integer wrstatus;
+    //监测温度，单位°C
+    private String tvalue;
 
-    @ApiModelProperty("倾斜状态  0：正常状态  1：设备状态报警")
-    private Integer wdstatus;
+    //水压/水位状态0：水压正常   1:欠压警告    2:过压警告
+    private String wpstatus;
 
-    @ApiModelProperty("震动报警  0：正常状态  1：设备状态报警")
-    private Integer wkstatus;
+    //变化率状态  0：正常状态  1：设备状态报警
+    private String wrstatus;
 
-    @ApiModelProperty("漏水状态  0：正常状态  1：设备状态报警")
-    private Integer wostatus;
+    //倾斜状态  0：正常状态  1：设备状态报警
+    private String wdstatus;
 
-    @ApiModelProperty("本次流量")
+    //震动报警  0：正常状态  1：设备状态报警
+    private String wkstatus;
+
+    //漏水状态  0：正常状态  1：设备状态报警
+    private String wostatus;
+
+
+    private String wbstatus;
+
+    //信号强度
+    private String dsignal;
+
+    //本次流量
     private String singleflow;
 
-    @ApiModelProperty("累计流量")
+    //累计流量
     private String totalflow;
 
-    @ApiModelProperty("采集时间-时间戳")
-    private long collectiontime;
+    //采集时间
+    private String collectiontime;
 
-    public Long getXdsmokelogid() {
-        return xdsmokelogid;
+    //电池是否低压 1 表是正常，0 表示低压
+    private String batterys;
+
+
+    private String businesstype;
+
+    public String getHxmonitorid() {
+        return hxmonitorid;
     }
 
-    public void setXdsmokelogid(Long xdsmokelogid) {
-        this.xdsmokelogid = xdsmokelogid;
+    public void setHxmonitorid(String hxmonitorid) {
+        this.hxmonitorid = hxmonitorid;
     }
 
-    public Long getSmokeid() {
+    public String getSmokeid() {
         return smokeid;
     }
 
-    public void setSmokeid(Long smokeid) {
+    public void setSmokeid(String smokeid) {
         this.smokeid = smokeid;
-    }
-
-    public Integer getMessagetype() {
-        return messagetype;
-    }
-
-    public void setMessagetype(Integer messagetype) {
-        this.messagetype = messagetype;
-    }
-
-    public String getDevicetype() {
-        return devicetype;
-    }
-
-    public void setDevicetype(String devicetype) {
-        this.devicetype = devicetype;
     }
 
     public String getMac() {
@@ -129,100 +106,52 @@ public class SensorDataDto {
         this.mac = mac;
     }
 
-    public String getCcid() {
-        return ccid;
-    }
-
-    public void setCcid(String ccid) {
-        this.ccid = ccid;
-    }
-
-    public String getImsi() {
-        return imsi;
-    }
-
-    public void setImsi(String imsi) {
-        this.imsi = imsi;
-    }
-
-    public Integer getDsignal() {
-        return dsignal;
-    }
-
-    public void setDsignal(Integer dsignal) {
-        this.dsignal = dsignal;
-    }
-
-    public Integer getBatterys() {
-        return batterys;
-    }
-
-    public void setBatterys(Integer batterys) {
-        this.batterys = batterys;
-    }
-
-    public Integer getVoltagevalue() {
+    public String getVoltagevalue() {
         return voltagevalue;
     }
 
-    public void setVoltagevalue(Integer voltagevalue) {
+    public void setVoltagevalue(String voltagevalue) {
         this.voltagevalue = voltagevalue;
     }
 
-    public Integer getTvalue() {
-        return tvalue;
+    public String getType() {
+        return type;
     }
 
-    public void setTvalue(Integer tvalue) {
-        this.tvalue = tvalue;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    public String getImei() {
-        return Imei;
+    public String getCodetype() {
+        return codetype;
     }
 
-    public void setImei(String imei) {
-        Imei = imei;
+    public void setCodetype(String codetype) {
+        this.codetype = codetype;
     }
 
-    public String getCcc() {
-        return ccc;
+    public String getCode() {
+        return code;
     }
 
-    public void setCcc(String ccc) {
-        this.ccc = ccc;
+    public void setCode(String code) {
+        this.code = code;
     }
 
-    public Integer getTamperstatus() {
-        return tamperstatus;
+    public String getMonitorname() {
+        return monitorname;
     }
 
-    public void setTamperstatus(Integer tamperstatus) {
-        this.tamperstatus = tamperstatus;
+    public void setMonitorname(String monitorname) {
+        this.monitorname = monitorname;
     }
 
-    public Long getCreatetime() {
-        return createtime;
+    public String getData() {
+        return data;
     }
 
-    public void setCreatetime(Long createtime) {
-        this.createtime = createtime;
-    }
-
-    public Integer getCstatus() {
-        return cstatus;
-    }
-
-    public void setCstatus(Integer cstatus) {
-        this.cstatus = cstatus;
-    }
-
-    public String getMonitordata() {
-        return monitordata;
-    }
-
-    public void setMonitordata(String monitordata) {
-        this.monitordata = monitordata;
+    public void setData(String data) {
+        this.data = data;
     }
 
     public String getDataunit() {
@@ -233,44 +162,76 @@ public class SensorDataDto {
         this.dataunit = dataunit;
     }
 
-    public Integer getWpstatus() {
+    public String getCreatetime() {
+        return createtime;
+    }
+
+    public void setCreatetime(String createtime) {
+        this.createtime = createtime;
+    }
+
+    public String getTvalue() {
+        return tvalue;
+    }
+
+    public void setTvalue(String tvalue) {
+        this.tvalue = tvalue;
+    }
+
+    public String getWpstatus() {
         return wpstatus;
     }
 
-    public void setWpstatus(Integer wpstatus) {
+    public void setWpstatus(String wpstatus) {
         this.wpstatus = wpstatus;
     }
 
-    public Integer getWrstatus() {
+    public String getWrstatus() {
         return wrstatus;
     }
 
-    public void setWrstatus(Integer wrstatus) {
+    public void setWrstatus(String wrstatus) {
         this.wrstatus = wrstatus;
     }
 
-    public Integer getWdstatus() {
+    public String getWdstatus() {
         return wdstatus;
     }
 
-    public void setWdstatus(Integer wdstatus) {
+    public void setWdstatus(String wdstatus) {
         this.wdstatus = wdstatus;
     }
 
-    public Integer getWkstatus() {
+    public String getWkstatus() {
         return wkstatus;
     }
 
-    public void setWkstatus(Integer wkstatus) {
+    public void setWkstatus(String wkstatus) {
         this.wkstatus = wkstatus;
     }
 
-    public Integer getWostatus() {
+    public String getWostatus() {
         return wostatus;
     }
 
-    public void setWostatus(Integer wostatus) {
+    public void setWostatus(String wostatus) {
         this.wostatus = wostatus;
+    }
+
+    public String getWbstatus() {
+        return wbstatus;
+    }
+
+    public void setWbstatus(String wbstatus) {
+        this.wbstatus = wbstatus;
+    }
+
+    public String getDsignal() {
+        return dsignal;
+    }
+
+    public void setDsignal(String dsignal) {
+        this.dsignal = dsignal;
     }
 
     public String getSingleflow() {
@@ -289,11 +250,27 @@ public class SensorDataDto {
         this.totalflow = totalflow;
     }
 
-    public long getCollectiontime() {
+    public String getCollectiontime() {
         return collectiontime;
     }
 
-    public void setCollectiontime(long collectiontime) {
+    public void setCollectiontime(String collectiontime) {
         this.collectiontime = collectiontime;
+    }
+
+    public String getBatterys() {
+        return batterys;
+    }
+
+    public void setBatterys(String batterys) {
+        this.batterys = batterys;
+    }
+
+    public String getBusinesstype() {
+        return businesstype;
+    }
+
+    public void setBusinesstype(String businesstype) {
+        this.businesstype = businesstype;
     }
 }

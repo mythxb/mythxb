@@ -1,5 +1,7 @@
 package com.rzyc.fulongapi.websocket;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.rzyc.fulongapi.service.SersorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +15,7 @@ import javax.websocket.Session;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -68,7 +71,6 @@ public class SersorWs {
         log.info("【VitalSigns消息】有新的连接"+userId+", 总数:{}", clientList.size());
         try {
             SersorService sersorService = applicationContext.getBean(SersorService.class);
-            //发送呼吸心率传感器数据
             sersorService.sendSersor(userId);
         }catch (Exception e){
             e.printStackTrace();
@@ -109,6 +111,10 @@ public class SersorWs {
         System.out.println("onMessage uesrId --- > "+userId);
         log.info("【VitalSigns消息】收到客户端<"+userId+">发来的消息:{}", message);
         session.getAsyncRemote().sendText("服务端接收到消息！");
+        JSONObject jsonObject = JSONObject.parseObject(message);
+        System.out.println("jsonObject ---> "+JSONArray.toJSONString(jsonObject));
+        SersorService sersorService = applicationContext.getBean(SersorService.class);
+        sersorService.sendSersor(userId,jsonObject.get("smokeid")+"");
     }
 
     //新增一个方法用于主动向客户端发送消息
