@@ -127,7 +127,7 @@ public class LogAspect {
         logs.setUserId(userId);
         logs.setParameter(requestStr+"->"+requestBodyStr);
         logs.setResponseStr(JSONArray.toJSONString(responseMap));
-        logs.setIp(request.getRemoteAddr());
+        logs.setIp(getIpAddr(request));
         logs.setBehavior(request.getRequestURI());
         saveLog saveLog = new saveLog(logs);
         Thread thread = new Thread(saveLog);
