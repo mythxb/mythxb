@@ -2083,17 +2083,138 @@ public class DataController extends BaseController {
         return result;
     }
 
-    public static void main(String[] args) {
-        try {
-            String str = "伏龙西街2号9栋9单元3楼3号";
-            String[] strs = str.split("号");
-            System.out.println(strs[1]);
-        }catch (Exception e){
-            e.printStackTrace();
+    /**
+     *导入出警记录 未写完
+     * @version v1.0
+     * @author dong
+     * @date 2023/4/11 21:09
+     */
+    @ApiOperation(value = "导入出警记录", notes = "导入出警记录")
+    @RequestMapping(value = "/importCjjl", method = RequestMethod.POST)
+    @ResponseBody
+    public SingleResult<String> importCjjl(@RequestBody MultipartFile multipartFile) throws Exception {
+        SingleResult<String> result = new SingleResult<>();
+        if (null != multipartFile) {
+            Workbook wookbook = WorkbookFactory.create(multipartFile.getInputStream());
+            Sheet sheet = wookbook.getSheetAt(0);
+
+            //获得表头
+            Row rowHead = sheet.getRow(0);
+
+            System.out.println("getPhysicalNumberOfCells -> " + rowHead.getPhysicalNumberOfCells());
+            //判断表头是否正确
+            if (true) {
+                //获得数据的总行数
+                int totalRowNum = sheet.getLastRowNum();
+
+                if (totalRowNum > 0) {
+
+                    DataFormatter dataFormatter = new DataFormatter();
+
+
+
+                    Integer index = 1;
+
+                    //获得所有数据
+                    for (int i = 1; i <= totalRowNum; i++) {
+
+                        String residentName = "";
+                        String residentIdentityCard = "";
+                        String floorId = "";
+                        String unitId = "";
+                        Integer status = 1;
+                        Integer residentType = 2;
+                        String addressText = "";
+
+                        //获得第i行对象
+                        Row row = sheet.getRow(i);
+                        if (null == row) {
+                            break;
+                        }
+
+                        System.out.println("index -> " + index);
+                        index++;
+
+
+                        Cell cell = row.getCell((short) 1);
+                        if (null != cell) {
+                            residentIdentityCard = dataFormatter.formatCellValue(cell);
+                        }
+
+                        cell = row.getCell((short) 2);
+                        if (null != cell) {
+                            residentName = dataFormatter.formatCellValue(cell);
+                        }
+
+                        cell = row.getCell((short) 8);
+                        if (null != cell) {
+                            addressText = dataFormatter.formatCellValue(cell);
+                        }
+
+                        //2、东街 1、西街
+                        Integer direction = 2;
+
+                        if(addressText.contains("伏龙西街")){
+                            direction = 1;
+                        }
+
+                        addressText = addressText.replace("四川省成都市天府新区","");
+
+                        String[] strs = addressText.split("号");
+                        addressText = strs[1];
+
+                        String[] builds = addressText.split("栋");
+                        String[] units = builds[1].split("单元");
+                        String[] floors = units[1].split("楼");
+
+                        String buildNum = builds[0];
+                        String unitNum = units[0];
+                        String floorNum = floors[0];
+
+                        System.out.println("residentName ---> "+residentName);
+                        System.out.println("residentIdentityCard ---> "+residentIdentityCard);
+                        System.out.println("addressText ---> "+addressText);
+                        System.out.println("direction ---> "+direction);
+                        System.out.println("楼栋 ---> "+buildNum);
+                        System.out.println("单元 ---> "+unitNum);
+                        System.out.println("楼 ---> "+floorNum);
+
+                        Building building = buildingMapper.findBuilding(direction,TypeConversion.StringToInteger(buildNum));
+                        if(null != building){
+                            BuildUnit buildUnit = buildUnitMapper.findByBuildingId(building.getBuildId(),TypeConversion.StringToInteger(unitNum));
+                            if(null != buildUnit){
+                                BuildFloor floor = buildFloorMapper.findFloorByUnitIdAndFloorNumber(buildUnit.getUnitId(),TypeConversion.StringToInteger(floorNum));
+                                if(null != floor){
+                                    String idCard = AesEncryptUtil.encrypt(residentIdentityCard);
+
+                                    BuildingResident buildingResident = buildingResidentMapper.findByIdCard(idCard);
+                                    if(null == buildingResident){
+                                        buildingResident = new BuildingResident();
+                                        buildingResident.setResidentId(RandomNumber.getUUid());
+                                        buildingResident.setResidentName(residentName);
+                                        buildingResident.setResidentIdentityCard(idCard);
+                                        buildingResident.setResidentType(residentType);
+                                        buildingResident.setStatus(status);
+                                        buildingResident.setBuildingId(building.getBuildId());
+                                        buildingResident.setBuildingUnitId(buildUnit.getUnitId());
+                                        buildingResident.setFloorId(floor.getFloorId());
+                                        buildingResident.setCreateBy("excel");
+                                        buildingResident.setCreateTime(new Date());
+                                        buildingResident.setModifyBy("excel");
+                                        buildingResident.setModifyTime(new Date());
+                                        buildingResidentMapper.insert(buildingResident);
+                                    }
+                                }
+                            }
+                        }
+                        System.out.println();
+                    }
+
+                }
+            }
         }
-
+        return result;
     }
-
 
 
 
